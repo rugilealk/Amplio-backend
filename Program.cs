@@ -1,12 +1,13 @@
+using PSI.Models;
+using PSI.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<PlaylistService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -14,28 +15,29 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+var playlist = app.MapGroup("/playlist");
 
-app.MapGet("/weatherforecast", () =>
+playlist.MapGet("/", (PlaylistService svc) => svc.GetAll());
+
+playlist.MapGet("/{id}", (Guid id, PlaylistService svc) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    var song = svc.GetById(id);
+    return song is not null 
+        ? Results.Ok(song) 
+        : Results.NotFound();
+});
+
+playlist.MapPost("/add", (Song newSong, PlaylistService svc) =>
+{
+    svc.AddSong(newSong);
+    return Results.Created($"/playlist/{newSong.Id}", newSong);
+});
+
+playlist.MapPost("/{id}/vote", (Guid id, PlaylistService svc) =>
+{
+    return svc.Upvote(id)
+        ? Results.Ok(svc.GetAll())
+        : Results.NotFound();
+});
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
