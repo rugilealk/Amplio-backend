@@ -11,8 +11,6 @@ public class PlaylistService
 
     public void AddSong(Song song)
     {
-        song.Id = Guid.NewGuid();
-        song.Votes = 0;
         _songs.Add(song);
     }
 
