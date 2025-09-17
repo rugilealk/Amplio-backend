@@ -4,6 +4,7 @@ using PSI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<SongService>();
 builder.Services.AddSingleton<PlaylistService>();
 
 var app = builder.Build();
@@ -15,29 +16,60 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var playlist = app.MapGroup("/playlist");
-
-playlist.MapGet("/", (PlaylistService svc) => svc.GetAll());
-
-playlist.MapGet("/{id}", (Guid id, PlaylistService svc) =>
+// ----- Songs -----
+var songs = app.MapGroup("/songs");
+songs.MapGet("/", (SongService svc) => svc.GetAll());
+songs.MapGet("/{songId}", (Guid songId, SongService svc) =>
 {
-    var song = svc.GetById(id);
-    return song is not null 
-        ? Results.Ok(song) 
-        : Results.NotFound();
+    var s = svc.GetById(songId);
+    return s is not null ? Results.Ok(s) : Results.NotFound();
 });
 
-playlist.MapPost("/add", (Song newSong, PlaylistService svc) =>
+// ----- Playlists -----
+var playlists = app.MapGroup("/playlist");
+
+playlists.MapPost("/", (PlaylistService svc) =>
 {
-    svc.AddSong(newSong);
-    return Results.Created($"/playlist/{newSong.Id}", newSong);
+    var pl = svc.Create();
+    return Results.Created($"/playlist/{pl.PlaylistId}", new { pl.PlaylistId });
 });
 
-playlist.MapPost("/{id}/vote", (Guid id, PlaylistService svc) =>
+playlists.MapGet("/{playlistId}", (Guid playlistId, PlaylistService svc) =>
 {
-    return svc.Upvote(id)
-        ? Results.Ok(svc.GetAll())
-        : Results.NotFound();
+    var pl = svc.Get(playlistId);
+    return pl is not null ? Results.Ok(pl.GetAllSongs()) : Results.NotFound();
+});
+
+playlists.MapPost("/{playlistId}/add/{songId}",
+    (Guid playlistId, Guid songId, PlaylistService pSvc, SongService sSvc) =>
+{
+    var pl = pSvc.Get(playlistId);
+    if (pl == null) return Results.NotFound("Playlist not found");
+
+    var song = sSvc.GetById(songId);
+    if (song == null) return Results.NotFound("Song not found");
+
+    pl.AddSong(song);
+    return Results.Ok(pl.GetAllSongs());
+});
+
+playlists.MapDelete("/{playlistId}/song/{songId}",
+    (Guid playlistId, Guid songId, PlaylistService svc) =>
+{
+    var pl = svc.Get(playlistId);
+    if (pl == null) return Results.NotFound();
+
+    return pl.DeleteSong(songId) ? Results.Ok() : Results.NotFound();
+});
+
+playlists.MapPost("/{playlistId}/vote/{songId}",
+    (Guid playlistId, Guid songId, PlaylistService svc) =>
+{
+    var pl = svc.Get(playlistId);
+    if (pl == null) return Results.NotFound();
+
+    pl.UpvoteSong(songId);
+    return Results.Ok(pl.GetAllSongs());
 });
 
 app.Run();
