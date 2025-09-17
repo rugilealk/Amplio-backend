@@ -36,14 +36,14 @@ playlists.MapPost("/", (PlaylistService svc) =>
 
 playlists.MapGet("/{playlistId}", (Guid playlistId, PlaylistService svc) =>
 {
-    var pl = svc.Get(playlistId);
+    var pl = svc.GetById(playlistId);
     return pl is not null ? Results.Ok(pl.GetAllSongs()) : Results.NotFound();
 });
 
 playlists.MapPost("/{playlistId}/add/{songId}",
     (Guid playlistId, Guid songId, PlaylistService pSvc, SongService sSvc) =>
 {
-    var pl = pSvc.Get(playlistId);
+    var pl = pSvc.GetById(playlistId);
     if (pl == null) return Results.NotFound("Playlist not found");
 
     var song = sSvc.GetById(songId);
@@ -53,10 +53,10 @@ playlists.MapPost("/{playlistId}/add/{songId}",
     return Results.Ok(pl.GetAllSongs());
 });
 
-playlists.MapDelete("/{playlistId}/song/{songId}",
+playlists.MapDelete("/{playlistId}/delete/{songId}",
     (Guid playlistId, Guid songId, PlaylistService svc) =>
 {
-    var pl = svc.Get(playlistId);
+    var pl = svc.GetById(playlistId);
     if (pl == null) return Results.NotFound();
 
     return pl.DeleteSong(songId) ? Results.Ok() : Results.NotFound();
@@ -65,7 +65,7 @@ playlists.MapDelete("/{playlistId}/song/{songId}",
 playlists.MapPost("/{playlistId}/vote/{songId}",
     (Guid playlistId, Guid songId, PlaylistService svc) =>
 {
-    var pl = svc.Get(playlistId);
+    var pl = svc.GetById(playlistId);
     if (pl == null) return Results.NotFound();
 
     pl.UpvoteSong(songId);

@@ -13,6 +13,6 @@ public class PlaylistService
         return p;
     }
 
-    public Playlist? Get(Guid id) =>
+    public Playlist? GetById(Guid id) =>
         Playlists.FirstOrDefault(p => p.PlaylistId == id);
 }
