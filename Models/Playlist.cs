@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace PSI.Models;
+namespace PSI.Models
 {
 	public class Playlist
 	{
 		private List<Song> Songs;
-		private readonly Guid PlaylistId;
+		public readonly Guid PlaylistId;
 
 		public Playlist()
 		{
