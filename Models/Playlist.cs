@@ -6,32 +6,35 @@ namespace PSI.Models
 {
 	public class Playlist
 	{
-		private List<Song> Songs;
+    private List<PlaylistSong> Songs;
 		public readonly Guid PlaylistId;
 
 		public Playlist()
 		{
-			Songs = new List<Song>();
+			Songs = new List<PlaylistSong>();
 			PlaylistId = Guid.NewGuid();
 		}
 
 		public void AddSong(Song newSong)
 		{
-			Songs.Add(newSong);
+			if (!Songs.Any(ps => ps.Song.Id == newSong.Id))
+			{
+            	Songs.Add(new PlaylistSong(newSong));
+			}
 		}
 
-		public List<Song> GetAllSongs() {  return Songs; }
+		public List<PlaylistSong> GetAllSongs() => Songs;
 
-		public Song? GetSongById(Guid id)
+		public PlaylistSong? GetSongById(Guid id)
 		{
-			return Songs.FirstOrDefault(s => s.Id == id);
+			return Songs.FirstOrDefault(s => s.Song.Id == id);
 		}
 
 		public bool DeleteSong(Guid id)
 		{
-			var song = GetSongById(id);
-			if (song == null) return false;
-			return Songs.Remove(song);
+			var ps = GetSongById(id);
+			if (ps == null) return false;
+			return Songs.Remove(ps);
 		}
 
 		public int ReturnCount()
@@ -41,10 +44,10 @@ namespace PSI.Models
 
 		public void UpvoteSong(Guid id)
         {
-            var song = GetSongById(id);
-            if (song != null)
+            var ps = GetSongById(id);
+            if (ps != null)
             {
-                song.Upvote();
+                ps.Upvote();
                 SortSongs();
             }
         }
