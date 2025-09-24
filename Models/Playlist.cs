@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace PSI.Models
+﻿namespace PSI.Models
 {
 	public class Playlist
 	{
