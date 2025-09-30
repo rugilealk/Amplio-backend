@@ -1,57 +1,38 @@
 ﻿namespace PSI.Models
 {
-	public class Playlist
-	{
-		private List<PlaylistSong> songs;
-		public readonly Guid PlaylistId;
+    public class Playlist
+    {
+        public Guid PlaylistId { get; set; } = Guid.NewGuid();
+        public ICollection<PlaylistSong> Songs { get; set; } = new List<PlaylistSong>();
 
-		public Playlist()
-		{
-			songs = new List<PlaylistSong>();
-			PlaylistId = Guid.NewGuid();
-		}
-
-		public void AddSong(Song newSong)
-		{
-			if (!songs.Any(playlistSong => playlistSong.Song.Id == newSong.Id))
-			{
-            	songs.Add(new PlaylistSong(newSong));
-			}
-		}
-
-		public List<PlaylistSong> GetAllSongs() => songs;
-
-		public PlaylistSong? GetSongById(Guid id)
-		{
-			return songs.FirstOrDefault(playlistSong => playlistSong.Song.Id == id);
-		}
-
-		public bool DeleteSong(Guid id)
-		{
-			var playlistSong = GetSongById(id);
-			if (playlistSong == null) return false;
-			return songs.Remove(playlistSong);
-		}
-
-		public int ReturnCount()
-		{
-			return songs.Count;
-		}
-
-		public void UpvoteSong(Guid id)
+        public void AddSong(Song songToAdd)
         {
-            var playlistSong = GetSongById(id);
-            if (playlistSong != null)
+            bool songAlreadyExists = Songs.Any(playlistSong => playlistSong.SongId == songToAdd.Id);
+            if (!songAlreadyExists)
             {
-                playlistSong.Upvote();
-                SortSongs();
+                var newPlaylistSong = new PlaylistSong(songToAdd, this);
+                Songs.Add(newPlaylistSong);
             }
         }
 
-		private void SortSongs()
-		{
-			songs = songs.OrderByDescending(playlistSong => playlistSong.Votes).ToList();
-		}
+        public List<PlaylistSong> GetAllSongs() =>
+            Songs.OrderByDescending(playlistSong => playlistSong.Votes).ToList();
 
-}
+        public PlaylistSong? GetSongById(Guid songId) =>
+            Songs.FirstOrDefault(playlistSong => playlistSong.SongId == songId);
+
+        public bool DeleteSong(Guid songId)
+        {
+            var playlistSongToRemove = GetSongById(songId);
+            if (playlistSongToRemove == null) return false;
+            Songs.Remove(playlistSongToRemove);
+            return true;
+        }
+
+        public void UpvoteSong(Guid songId)
+        {
+            var playlistSongToUpvote = GetSongById(songId);
+            if (playlistSongToUpvote != null) playlistSongToUpvote.Upvote();
+        }
+    }
 }

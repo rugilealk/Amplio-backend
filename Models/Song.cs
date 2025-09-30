@@ -1,13 +1,19 @@
-namespace PSI.Models;
-
-public class Song
+namespace PSI.Models
 {
-    public Guid Id { get; private set; } = Guid.NewGuid();
-    public string Title { get; private set; }
-    public string Artist { get; private set; }
-    public Song(string title, string artist)
+    public class Song
     {
-        Title = title;
-        Artist = artist;
+        public Guid Id { get; set; } = Guid.NewGuid();
+        public string Title { get; set; } = string.Empty;
+        public string Artist { get; set; } = string.Empty;
+
+        public ICollection<PlaylistSong> PlaylistSongs { get; set; } = new List<PlaylistSong>();
+
+        public Song() { }
+
+        public Song(string songTitle, string songArtist)
+        {
+            Title = songTitle;
+            Artist = songArtist;
+        }
     }
 }

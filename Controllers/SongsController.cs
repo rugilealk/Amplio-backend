@@ -1,27 +1,45 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PSI.Services;
+using PSI.Models;
 
-[Route("songs")]
-[ApiController]
-public class SongsController : ControllerBase
+namespace PSI.Controllers
 {
-    private readonly SongService songService;
-
-    public SongsController(SongService songService)
+    [Route("songs")]
+    [ApiController]
+    public class SongsController : ControllerBase
     {
-        this.songService = songService;
-    }
+        private readonly SongService songService;
 
-    [HttpGet]
-    public IActionResult GetAll()
-    {
-        return Ok(songService.GetAll());
-    }
+        public SongsController(SongService songService)
+        {
+            this.songService = songService;
+        }
 
-    [HttpGet("{songId:guid}")]
-    public IActionResult GetById(Guid songId)
-    {
-        var song = songService.GetById(songId);
-        return song is not null ? Ok(song) : NotFound();
+        [HttpGet]
+        public async Task<IActionResult> GetAllSongs()
+        {
+            var allSongs = await songService.GetAllSongsAsync();
+            return Ok(allSongs);
+        }
+
+        [HttpGet("{songId:guid}")]
+        public async Task<IActionResult> GetSongById(Guid songId)
+        {
+            var song = await songService.GetSongByIdAsync(songId);
+            return song is not null ? Ok(song) : NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateSong([FromBody] SongDto songDto)
+        {
+            var createdSong = await songService.CreateSongAsync(songDto.Title, songDto.Artist);
+            return Created($"/songs/{createdSong.Id}", createdSong);
+        }
+
+        public class SongDto
+        {
+            public string Title { get; set; } = string.Empty;
+            public string Artist { get; set; } = string.Empty;
+        }
     }
 }

@@ -1,12 +1,20 @@
 using PSI.Models;
+using Microsoft.EntityFrameworkCore;
+using PSI.Data;
 
-namespace PSI.Services;
+namespace PSI.Services
+{
 
 public class SongService
 {
-    private readonly List<Song> songs;
+    private readonly AppDbContext databaseContext;
 
-    public SongService()
+    public SongService(AppDbContext databaseContext)
+    {
+        this.databaseContext = databaseContext;
+    }
+
+    /*public SongService()
     {
         songs = new List<Song>
         {
@@ -16,10 +24,24 @@ public class SongService
             new Song("Shake It Off", "Taylor Swift"),
             new Song("Smells Like Teen Spirit", "Nirvana")
         };
+    }*/
+
+    public async Task<IEnumerable<Song>> GetAllSongsAsync()
+    {
+        return await databaseContext.Songs.ToListAsync();
     }
 
-    public IEnumerable<Song> GetAll() => songs;
+    public async Task<Song?> GetSongByIdAsync(Guid songId)
+    {
+        return await databaseContext.Songs.FindAsync(songId);
+    }
 
-    public Song? GetById(Guid id) =>
-        songs.FirstOrDefault(s => s.Id == id);
+    public async Task<Song> CreateSongAsync(string songTitle, string songArtist)
+    {
+        var newSong = new Song(songTitle, songArtist);
+        databaseContext.Songs.Add(newSong);
+        await databaseContext.SaveChangesAsync();
+        return newSong;
+    }
+}
 }

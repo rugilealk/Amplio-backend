@@ -1,15 +1,28 @@
-namespace PSI.Models;
-
-public class PlaylistSong
+namespace PSI.Models
 {
-    public Song Song { get; }
-    public int Votes { get; private set; }
+    public class PlaylistSong
+    {
+        public Guid PlaylistId { get; set; }
+        public Playlist Playlist { get; set; } = null!;
 
-    public PlaylistSong(Song song)
-    { 
-        Song = song; 
+        public Guid SongId { get; set; }
+        public Song Song { get; set; } = null!;
+
+        public int Votes { get; set; }
+
+        public PlaylistSong() { }
+
+        public PlaylistSong(Song linkedSong, Playlist linkedPlaylist)
+        {
+            Song = linkedSong;
+            SongId = linkedSong.Id;
+            Playlist = linkedPlaylist;
+            PlaylistId = linkedPlaylist.PlaylistId;
+        }
+
+        public void Upvote()
+        {
+            Votes++;
+        }
     }
-       
-
-    public void Upvote() => Votes++;
 }
