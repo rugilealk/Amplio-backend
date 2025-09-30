@@ -6,9 +6,10 @@ public class PlaylistSong
     public int Votes { get; private set; }
 
     public PlaylistSong(Song song)
-    {
-        Song = song;
+    { 
+        Song = song; 
     }
+       
 
     public void Upvote() => Votes++;
 }

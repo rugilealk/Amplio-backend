@@ -2,55 +2,55 @@
 {
 	public class Playlist
 	{
-    private List<PlaylistSong> Songs;
+		private List<PlaylistSong> songs;
 		public readonly Guid PlaylistId;
 
 		public Playlist()
 		{
-			Songs = new List<PlaylistSong>();
+			songs = new List<PlaylistSong>();
 			PlaylistId = Guid.NewGuid();
 		}
 
 		public void AddSong(Song newSong)
 		{
-			if (!Songs.Any(ps => ps.Song.Id == newSong.Id))
+			if (!songs.Any(playlistSong => playlistSong.Song.Id == newSong.Id))
 			{
-            	Songs.Add(new PlaylistSong(newSong));
+            	songs.Add(new PlaylistSong(newSong));
 			}
 		}
 
-		public List<PlaylistSong> GetAllSongs() => Songs;
+		public List<PlaylistSong> GetAllSongs() => songs;
 
 		public PlaylistSong? GetSongById(Guid id)
 		{
-			return Songs.FirstOrDefault(s => s.Song.Id == id);
+			return songs.FirstOrDefault(playlistSong => playlistSong.Song.Id == id);
 		}
 
 		public bool DeleteSong(Guid id)
 		{
-			var ps = GetSongById(id);
-			if (ps == null) return false;
-			return Songs.Remove(ps);
+			var playlistSong = GetSongById(id);
+			if (playlistSong == null) return false;
+			return songs.Remove(playlistSong);
 		}
 
 		public int ReturnCount()
 		{
-			return Songs.Count;
+			return songs.Count;
 		}
 
 		public void UpvoteSong(Guid id)
         {
-            var ps = GetSongById(id);
-            if (ps != null)
+            var playlistSong = GetSongById(id);
+            if (playlistSong != null)
             {
-                ps.Upvote();
+                playlistSong.Upvote();
                 SortSongs();
             }
         }
 
 		private void SortSongs()
 		{
-			Songs = Songs.OrderByDescending(s => s.Votes).ToList();
+			songs = songs.OrderByDescending(playlistSong => playlistSong.Votes).ToList();
 		}
 
 }

@@ -5,23 +5,23 @@ using PSI.Services;
 [ApiController]
 public class SongsController : ControllerBase
 {
-    private readonly SongService _svc;
+    private readonly SongService songService;
 
-    public SongsController(SongService svc)
+    public SongsController(SongService songService)
     {
-        _svc = svc;
+        this.songService = songService;
     }
 
     [HttpGet]
     public IActionResult GetAll()
     {
-        return Ok(_svc.GetAll());
+        return Ok(songService.GetAll());
     }
 
     [HttpGet("{songId:guid}")]
     public IActionResult GetById(Guid songId)
     {
-        var song = _svc.GetById(songId);
+        var song = songService.GetById(songId);
         return song is not null ? Ok(song) : NotFound();
     }
 }

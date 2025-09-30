@@ -5,58 +5,58 @@ using PSI.Services;
 [ApiController]
 public class PlaylistsController : ControllerBase
 {
-    private readonly PlaylistService _playlistService;
-    private readonly SongService _songService;
+    private readonly PlaylistService playlistService;
+    private readonly SongService songService;
 
     public PlaylistsController(PlaylistService playlistService, SongService songService)
     {
-        _playlistService = playlistService;
-        _songService = songService;
+        this.playlistService = playlistService;
+        this.songService = songService;
     }
 
     [HttpPost]
     public IActionResult Create()
     {
-        var pl = _playlistService.Create();
-        return Created($"/playlist/{pl.PlaylistId}", new { pl.PlaylistId });
+        var newPlaylist = playlistService.Create();
+        return Created($"/playlist/{newPlaylist.PlaylistId}", new { newPlaylist.PlaylistId });
     }
 
     [HttpGet("{playlistId:guid}")]
     public IActionResult GetAllSongs(Guid playlistId)
     {
-        var pl = _playlistService.GetById(playlistId);
-        return pl is not null ? Ok(pl.GetAllSongs()) : NotFound();
+        var existingPlaylist = playlistService.GetById(playlistId);
+        return existingPlaylist is not null ? Ok(existingPlaylist.GetAllSongs()) : NotFound();
     }
 
     [HttpPost("{playlistId:guid}/add/{songId:guid}")]
     public IActionResult AddSong(Guid playlistId, Guid songId)
     {
-        var pl = _playlistService.GetById(playlistId);
-        if (pl == null) return NotFound("Playlist not found");
+        var existingPlaylist = playlistService.GetById(playlistId);
+        if (existingPlaylist == null) return NotFound("Playlist not found");
 
-        var song = _songService.GetById(songId);
+        var song = songService.GetById(songId);
         if (song == null) return NotFound("Song not found");
 
-        pl.AddSong(song);
-        return Ok(pl.GetAllSongs());
+        existingPlaylist.AddSong(song);
+        return Ok(existingPlaylist.GetAllSongs());
     }
 
     [HttpDelete("{playlistId:guid}/delete/{songId:guid}")]
     public IActionResult DeleteSong(Guid playlistId, Guid songId)
     {
-        var pl = _playlistService.GetById(playlistId);
-        if (pl == null) return NotFound();
+        var existingPlaylist = playlistService.GetById(playlistId);
+        if (existingPlaylist == null) return NotFound();
 
-        return pl.DeleteSong(songId) ? Ok() : NotFound();
+        return existingPlaylist.DeleteSong(songId) ? Ok() : NotFound();
     }
 
     [HttpPost("{playlistId:guid}/vote/{songId:guid}")]
     public IActionResult VoteSong(Guid playlistId, Guid songId)
     {
-        var pl = _playlistService.GetById(playlistId);
-        if (pl == null) return NotFound();
+        var existingPlaylist = playlistService.GetById(playlistId);
+        if (existingPlaylist == null) return NotFound();
 
-        pl.UpvoteSong(songId);
-        return Ok(pl.GetAllSongs());
+        existingPlaylist.UpvoteSong(songId);
+        return Ok(existingPlaylist.GetAllSongs());
     }
 }

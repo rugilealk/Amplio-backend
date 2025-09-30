@@ -4,15 +4,15 @@ namespace PSI.Services;
 
 public class PlaylistService
 {
-    private readonly List<Playlist> Playlists = new();
+    private readonly List<Playlist> playlist = new();
 
     public Playlist Create()
     {
-        var p = new Playlist();
-        Playlists.Add(p);
-        return p;
+        var playlist = new Playlist();
+        this.playlist.Add(playlist);
+        return playlist;
     }
 
     public Playlist? GetById(Guid id) =>
-        Playlists.FirstOrDefault(p => p.PlaylistId == id);
+        playlist.FirstOrDefault(playlist => playlist.PlaylistId == id);
 }

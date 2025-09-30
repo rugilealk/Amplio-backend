@@ -4,11 +4,11 @@ namespace PSI.Services;
 
 public class SongService
 {
-    private readonly List<Song> Songs;
+    private readonly List<Song> songs;
 
     public SongService()
     {
-        Songs = new List<Song>
+        songs = new List<Song>
         {
             new Song("Everlong", "Foo Fighters"),
             new Song("Billie Jean", "Michael Jackson"),
@@ -18,8 +18,8 @@ public class SongService
         };
     }
 
-    public IEnumerable<Song> GetAll() => Songs;
+    public IEnumerable<Song> GetAll() => songs;
 
     public Song? GetById(Guid id) =>
-        Songs.FirstOrDefault(s => s.Id == id);
+        songs.FirstOrDefault(s => s.Id == id);
 }
