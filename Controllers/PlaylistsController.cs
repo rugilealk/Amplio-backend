@@ -1,62 +1,72 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PSI.Services;
+using PSI.Models;
 
-[Route("playlist")]
-[ApiController]
-public class PlaylistsController : ControllerBase
+namespace PSI.Controllers
 {
-    private readonly PlaylistService playlistService;
-    private readonly SongService songService;
-
-    public PlaylistsController(PlaylistService playlistService, SongService songService)
+    [Route("playlist")]
+    [ApiController]
+    public class PlaylistsController : ControllerBase
     {
-        this.playlistService = playlistService;
-        this.songService = songService;
-    }
+        private readonly PlaylistService playlistService;
+        private readonly SongService songService;
 
-    [HttpPost]
-    public IActionResult Create()
-    {
-        var newPlaylist = playlistService.Create();
-        return Created($"/playlist/{newPlaylist.PlaylistId}", new { newPlaylist.PlaylistId });
-    }
+        public PlaylistsController(PlaylistService playlistService, SongService songService)
+        {
+            this.playlistService = playlistService;
+            this.songService = songService;
+        }
 
-    [HttpGet("{playlistId:guid}")]
-    public IActionResult GetAllSongs(Guid playlistId)
-    {
-        var existingPlaylist = playlistService.GetById(playlistId);
-        return existingPlaylist is not null ? Ok(existingPlaylist.GetAllSongs()) : NotFound();
-    }
+        [HttpPost]
+        public async Task<IActionResult> CreatePlaylist()
+        {
+            var createdPlaylist = await playlistService.CreatePlaylistAsync();
+            return Created($"/playlist/{createdPlaylist.PlaylistId}", new { createdPlaylist.PlaylistId });
+        }
 
-    [HttpPost("{playlistId:guid}/add/{songId:guid}")]
-    public IActionResult AddSong(Guid playlistId, Guid songId)
-    {
-        var existingPlaylist = playlistService.GetById(playlistId);
-        if (existingPlaylist == null) return NotFound("Playlist not found");
+        [HttpGet("{playlistId:guid}")]
+        public async Task<IActionResult> GetSongsInPlaylist(Guid playlistId)
+        {
+            var playlist = await playlistService.GetPlaylistByIdAsync(playlistId);
+            return playlist is not null ? Ok(playlist.GetAllSongs()) : NotFound();
+        }
 
-        var song = songService.GetById(songId);
-        if (song == null) return NotFound("Song not found");
+        [HttpPost("{playlistId:guid}/add/{songId:guid}")]
+        public async Task<IActionResult> AddSongToPlaylist(Guid playlistId, Guid songId)
+        {
+            var playlist = await playlistService.GetPlaylistByIdAsync(playlistId);
+            if (playlist == null) return NotFound("Playlist not found");
 
-        existingPlaylist.AddSong(song);
-        return Ok(existingPlaylist.GetAllSongs());
-    }
+            var song = await songService.GetSongByIdAsync(songId);
+            if (song == null) return NotFound("Song not found");
 
-    [HttpDelete("{playlistId:guid}/delete/{songId:guid}")]
-    public IActionResult DeleteSong(Guid playlistId, Guid songId)
-    {
-        var existingPlaylist = playlistService.GetById(playlistId);
-        if (existingPlaylist == null) return NotFound();
+            playlist.AddSong(song);
+            await playlistService.SaveChangesAsync();
+            return Ok(playlist.GetAllSongs());
+        }
 
-        return existingPlaylist.DeleteSong(songId) ? Ok() : NotFound();
-    }
+        [HttpDelete("{playlistId:guid}/delete/{songId:guid}")]
+        public async Task<IActionResult> RemoveSongFromPlaylist(Guid playlistId, Guid songId)
+        {
+            var playlist = await playlistService.GetPlaylistByIdAsync(playlistId);
+            if (playlist == null) return NotFound();
 
-    [HttpPost("{playlistId:guid}/vote/{songId:guid}")]
-    public IActionResult VoteSong(Guid playlistId, Guid songId)
-    {
-        var existingPlaylist = playlistService.GetById(playlistId);
-        if (existingPlaylist == null) return NotFound();
+            var wasDeleted = playlist.DeleteSong(songId);
+            if (!wasDeleted) return NotFound();
 
-        existingPlaylist.UpvoteSong(songId);
-        return Ok(existingPlaylist.GetAllSongs());
+            await playlistService.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPost("{playlistId:guid}/vote/{songId:guid}")]
+        public async Task<IActionResult> UpvoteSongInPlaylist(Guid playlistId, Guid songId)
+        {
+            var playlist = await playlistService.GetPlaylistByIdAsync(playlistId);
+            if (playlist == null) return NotFound();
+
+            playlist.UpvoteSong(songId);
+            await playlistService.SaveChangesAsync();
+            return Ok(playlist.GetAllSongs());
+        }
     }
 }
