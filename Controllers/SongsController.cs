@@ -29,18 +29,5 @@ namespace PSI.Controllers
             return song is not null ? Ok(song) : NotFound();
         }
 
-        // speju sita reik istrint controlleri tada
-        [HttpPost]
-        public async Task<IActionResult> CreateSong([FromBody] SongDto songDto)
-        {
-            var createdSong = await songService.CreateSongAsync(songDto.Title, songDto.Artist);
-            return Created($"/songs/{createdSong.Id}", createdSong);
-        }
-
-        public class SongDto
-        {
-            public string Title { get; set; } = string.Empty;
-            public string Artist { get; set; } = string.Empty;
-        }
     }
 }
