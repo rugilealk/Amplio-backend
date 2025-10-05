@@ -35,6 +35,8 @@ namespace PSI.Models
             var playlistSongToUpvote = GetSongById(songId);
             if (playlistSongToUpvote != null) playlistSongToUpvote.Upvote();
         }
+
+        //iterating the right way čia??
         public IEnumerator<PlaylistSong> GetEnumerator() => Songs.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
