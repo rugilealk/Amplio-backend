@@ -43,6 +43,11 @@ namespace PSI.Data
                 .Property(song => song.Artist)
                 .IsRequired()
                 .HasMaxLength(100);
+
+            modelBuilder.Entity<Song>()
+               .Property(s => s.FilePath)
+               .IsRequired()
+               .HasMaxLength(255);
         }
     }
 }
