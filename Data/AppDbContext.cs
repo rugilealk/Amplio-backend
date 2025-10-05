@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using PSI.Models;
 
 namespace PSI.Data
@@ -55,7 +56,11 @@ namespace PSI.Data
                 .Property(s => s.Genres)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                    v => JsonSerializer.Deserialize<List<Genre>>(v, (JsonSerializerOptions)null) ?? new List<Genre>());
+                    v => JsonSerializer.Deserialize<List<Genre>>(
+                        v,
+                        new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
+                    ) ?? new List<Genre>()
+    );
         }
     }
 }

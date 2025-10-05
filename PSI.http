@@ -4,20 +4,23 @@
 GET {{rootURL}}/songs
 Accept: application/json
 ### get secific song info
-GET {{rootURL}}/songs/d5e720db-fb11-4fd8-8a6a-ab1973f6cc64
+GET {{rootURL}}/songs/de72e547-e82c-4048-84db-7dc9bf5aa227
 Accept: application/json
 ### create playlist
 POST {{rootURL}}/playlist
 Content-Type: application/json
 {}
 ### get playlist by unique id
-GET {{rootURL}}/playlist/45be158b-0791-4a9a-bf42-026e2155b8b7
+GET {{rootURL}}/playlist/b8975d3c-7e10-49dd-b2de-0375b8e8858e
 Accept: application/json
 ### add song to specific playlist
-POST {{rootURL}}/playlist/45be158b-0791-4a9a-bf42-026e2155b8b7/add/1
+POST {{rootURL}}/playlist/b8975d3c-7e10-49dd-b2de-0375b8e8858e/add/de72e547-e82c-4048-84db-7dc9bf5aa227
 Content-Type: application/json
 {}
 ### vote for a specific song in a playlist
-POST {{rootURL}}/playlist/07a70fc8-5ca9-4683-9cb2-0b7e390f1272/vote/d5e720db-fb11-4fd8-8a6a-ab1973f6cc64
+POST {{rootURL}}/playlist/b8975d3c-7e10-49dd-b2de-0375b8e8858e/vote/de72e547-e82c-4048-84db-7dc9bf5aa227
 Content-Type: application/json
 {}
+### play a certain song:  veikia, geriau nesiuskit, nes pastrigs kompas oops
+//GET {{rootURL}}/songs/play/de72e547-e82c-4048-84db-7dc9bf5aa227
+

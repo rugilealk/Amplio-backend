@@ -29,10 +29,13 @@ namespace PSI.Models
             if (string.IsNullOrEmpty(FilePath))
                 throw new InvalidOperationException("File path for this song is not set.");
 
-            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), FilePath);
+            var filePathNormalized = FilePath.Replace('/', Path.DirectorySeparatorChar);
+
+            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", filePathNormalized);
+            fullPath = Path.GetFullPath(fullPath);
 
             if (!System.IO.File.Exists(fullPath))
-                throw new FileNotFoundException("Song file not found.", fullPath);
+                throw new FileNotFoundException("Song file not found." + fullPath);
 
             // Open the file for reading and return the stream
             return new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
