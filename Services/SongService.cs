@@ -23,6 +23,7 @@ namespace PSI.Services
             return await databaseContext.Songs.FindAsync(songId);
         }
 
+        // mums irgi sito nereik gal tada? 
         public async Task<Song> CreateSongAsync(string songTitle, string songArtist)
         {
             var newSong = new Song(songTitle, songArtist);

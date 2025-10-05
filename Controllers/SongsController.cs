@@ -29,6 +29,7 @@ namespace PSI.Controllers
             return song is not null ? Ok(song) : NotFound();
         }
 
+        // speju sita reik istrint controlleri tada
         [HttpPost]
         public async Task<IActionResult> CreateSong([FromBody] SongDto songDto)
         {
