@@ -1,15 +1,13 @@
 using PSI.Services;
 using PSI.Data;
-using Microsoft.EntityFrameworkCore; //prideta databaze
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//databaze
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-// Add services
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -26,6 +24,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.MapControllers(); // Map controller routes
+app.MapControllers();
 
 app.Run();
