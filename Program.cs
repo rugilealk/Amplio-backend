@@ -17,6 +17,15 @@ builder.Services.AddControllers()
 
 builder.Services.AddScoped<SongService>();
 builder.Services.AddScoped<PlaylistService>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Enums as strings
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+
+        // Avoid $id/$values for navigation properties
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 var app = builder.Build();
 
@@ -25,5 +34,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
 
 app.Run();

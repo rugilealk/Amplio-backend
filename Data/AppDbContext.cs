@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using PSI.Models;
 
 namespace PSI.Data
@@ -43,6 +45,22 @@ namespace PSI.Data
                 .Property(song => song.Artist)
                 .IsRequired()
                 .HasMaxLength(100);
+
+            modelBuilder.Entity<Song>()
+               .Property(s => s.FilePath)
+               .IsRequired()
+               .HasMaxLength(255);
+
+            // will convert the enumerable list into json string for storage    
+            modelBuilder.Entity<Song>()
+                .Property(s => s.Genres)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                    v => JsonSerializer.Deserialize<List<Genre>>(
+                        v,
+                        new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
+                    ) ?? new List<Genre>()
+    );
         }
     }
 }

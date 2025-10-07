@@ -29,17 +29,25 @@ namespace PSI.Controllers
             return song is not null ? Ok(song) : NotFound();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateSong([FromBody] SongDto songDto)
+        [HttpGet("play/{songId:guid}")]
+        public async Task<IActionResult> PlaySong(Guid songId)
         {
-            var createdSong = await songService.CreateSongAsync(songDto.Title, songDto.Artist);
-            return Created($"/songs/{createdSong.Id}", createdSong);
+            var song = await songService.GetSongByIdAsync(songId);
+            if (song == null)
+                return NotFound();
+            var filePathNormalized = song.FilePath.Replace('/', Path.DirectorySeparatorChar);
+
+            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", filePathNormalized);
+            fullPath = Path.GetFullPath(fullPath);
+          
+
+            if (!System.IO.File.Exists(fullPath))
+                return NotFound("File not found" + fullPath);
+
+            var fileStream = song.OpenStream();
+            var contentType = "audio/mpeg";
+            return File(fileStream, contentType, Path.GetFileName(fullPath));
         }
 
-        public class SongDto
-        {
-            public string Title { get; set; } = string.Empty;
-            public string Artist { get; set; } = string.Empty;
-        }
     }
 }

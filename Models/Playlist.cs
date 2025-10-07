@@ -1,6 +1,7 @@
-﻿namespace PSI.Models
+﻿using System.Collections;
+namespace PSI.Models
 {
-    public class Playlist
+    public class Playlist : IEnumerable<PlaylistSong>
     {
         public Guid PlaylistId { get; set; } = Guid.NewGuid();
         public ICollection<PlaylistSong> Songs { get; set; } = new List<PlaylistSong>();
@@ -34,5 +35,10 @@
             var playlistSongToUpvote = GetSongById(songId);
             if (playlistSongToUpvote != null) playlistSongToUpvote.Upvote();
         }
+
+        //iterating the right way čia??
+        public IEnumerator<PlaylistSong> GetEnumerator() => Songs.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
+
