@@ -13,14 +13,7 @@ namespace PSI.Models
         public FilePath FilePath { get; set; }
 
         public ICollection<PlaylistSong> PlaylistSongs { get; set; } = new List<PlaylistSong>();
-
-        public Song(string Title, string Artist, List<Genre> Genres, FilePath FilePath)
-        {
-            this.Title = Title;
-            this.Artist = Artist;
-            this.Genres = Genres;
-            this.FilePath = FilePath;
-        }
+        
 
         public Stream OpenStream()
         {
