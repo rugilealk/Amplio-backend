@@ -28,6 +28,17 @@ namespace PSI.Controllers
             var song = await songService.GetSongByIdAsync(songId);
             return song is not null ? Ok(song) : NotFound();
         }
+        // Demonstrates boxing and unboxing of the Genre enum (pavyzdys, no idea ar gerai)
+        [HttpGet("demo-boxing/{songId:guid}")]
+        public async Task<IActionResult> DemoBoxing(Guid songId)
+        {
+            var song = await songService.GetSongByIdAsync(songId);
+            if (song == null)
+                return NotFound();
+
+            PSI.Utils.BoxingDemo.DemonstrateGenreBoxingUnboxing(song);
+            return Ok("Boxing and unboxing demonstrated in console output.");
+        }
 
         [HttpGet("play/{songId:guid}")]
         public async Task<IActionResult> PlaySong(Guid songId)
