@@ -48,6 +48,10 @@ namespace PSI.Data
 
             modelBuilder.Entity<Song>()
                .Property(s => s.FilePath)
+                .HasConversion(
+                    v => v.Value, // Convert FilePath to string for storage
+                    v => new FilePath(v) // Convert string back to FilePath when reading
+                )
                .IsRequired()
                .HasMaxLength(255);
 

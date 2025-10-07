@@ -34,15 +34,17 @@ namespace PSI.Controllers
         {
             var song = await songService.GetSongByIdAsync(songId);
             if (song == null)
+            {
                 return NotFound();
-            var filePathNormalized = song.FilePath.Replace('/', Path.DirectorySeparatorChar);
+            }
 
-            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", filePathNormalized);
+            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", song.FilePath.Value);
             fullPath = Path.GetFullPath(fullPath);
           
-
             if (!System.IO.File.Exists(fullPath))
+            {
                 return NotFound("File not found" + fullPath);
+            }
 
             var fileStream = song.OpenStream();
             var contentType = "audio/mpeg";
