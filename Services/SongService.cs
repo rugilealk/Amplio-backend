@@ -22,5 +22,15 @@ namespace PSI.Services
         {
             return await databaseContext.Songs.FindAsync(songId);
         }
+        //iterating the right way
+        //iterates through all songs and prints their display names (nebutina programai, bet ivygdo reikalavima)
+        private async Task PrintAllSongDisplayNamesAsync()
+        {
+            var songs = await GetAllSongsAsync();
+            foreach (var song in songs)
+            {
+                Console.WriteLine(song.GetDisplayName());
+            }
+        }
     }
 }
