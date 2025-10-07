@@ -10,28 +10,19 @@ namespace PSI.Models
         public string Title { get; set; } = string.Empty;
         public string Artist { get; set; } = string.Empty;
         public List<Genre> Genres { get; set; } = new List<Genre>();
-        public string FilePath { get; set; } = string.Empty;
+        public FilePath FilePath { get; set; }
 
         public ICollection<PlaylistSong> PlaylistSongs { get; set; } = new List<PlaylistSong>();
-
-        public Song() { }
-
-        public Song(string Title, string Artist, List<Genre> Genres, string FilePath)
-        {
-            this.Title = Title;
-            this.Artist = Artist;
-            this.Genres = Genres;
-            this.FilePath = FilePath;
-        }
+        
 
         public Stream OpenStream()
         {
-            if (string.IsNullOrEmpty(FilePath))
+            if (string.IsNullOrEmpty(FilePath.Value))
+            {
                 throw new InvalidOperationException("File path for this song is not set.");
+            }
 
-            var filePathNormalized = FilePath.Replace('/', Path.DirectorySeparatorChar);
-
-            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", filePathNormalized);
+            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", FilePath.Value);
             fullPath = Path.GetFullPath(fullPath);
 
             if (!System.IO.File.Exists(fullPath))
