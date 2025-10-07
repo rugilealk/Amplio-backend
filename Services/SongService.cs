@@ -22,14 +22,5 @@ namespace PSI.Services
         {
             return await databaseContext.Songs.FindAsync(songId);
         }
-
-        // mums irgi sito nereik gal tada? 
-        public async Task<Song> CreateSongAsync(string songTitle, string songArtist, List<Genre> genres, string path)
-        {
-            var newSong = new Song(songTitle, songArtist, genres, path);
-            databaseContext.Songs.Add(newSong);
-            await databaseContext.SaveChangesAsync();
-            return newSong;
-        }
     }
 }
