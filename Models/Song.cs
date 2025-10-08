@@ -12,8 +12,6 @@ namespace PSI.Models
         public List<Genre> Genres { get; set; } = new List<Genre>();
         public FilePath FilePath { get; set; }
 
-        public ICollection<PlaylistSong> PlaylistSongs { get; set; } = new List<PlaylistSong>();
-        
 
         public Stream OpenStream()
         {
