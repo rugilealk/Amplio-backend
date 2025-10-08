@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PSI.DTOs;
 using PSI.Services;
-using PSI.Models;
 
 namespace PSI.Controllers
 {
@@ -18,10 +18,15 @@ namespace PSI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePlaylist()
+        public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistRequest request)
         {
-            var createdPlaylist = await _playlistService.CreatePlaylistAsync();
-            return Created($"/playlist/{createdPlaylist.PlaylistId}", new { createdPlaylist.PlaylistId }); //
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return BadRequest("Playlist name cannot be empty.");
+            }
+
+            var createdPlaylist = await _playlistService.CreatePlaylistAsync(request.Name);
+            return Created($"/playlist/{createdPlaylist.PlaylistId}", new { createdPlaylist.PlaylistId, createdPlaylist.Name });
         }
 
         [HttpGet("{playlistId:guid}")]
@@ -70,3 +75,5 @@ namespace PSI.Controllers
         }
     }
 }
+
+

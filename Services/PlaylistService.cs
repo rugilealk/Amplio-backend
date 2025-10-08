@@ -13,9 +13,9 @@ namespace PSI.Services
             this.databaseContext = databaseContext;
         }
 
-        public async Task<Playlist> CreatePlaylistAsync()
+        public async Task<Playlist> CreatePlaylistAsync(string name)
         {
-            var newPlaylist = new Playlist();
+            var newPlaylist = new Playlist(name);
             databaseContext.Playlists.Add(newPlaylist);
             await databaseContext.SaveChangesAsync();
             return newPlaylist;
