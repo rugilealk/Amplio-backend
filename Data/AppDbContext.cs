@@ -31,7 +31,7 @@ namespace PSI.Data
             // Configure relationship: PlaylistSong → Song
             modelBuilder.Entity<PlaylistSong>()
                 .HasOne(playlistSong => playlistSong.Song)
-                .WithMany(song => song.PlaylistSongs)
+                .WithMany()
                 .HasForeignKey(playlistSong => playlistSong.SongId)
                 .OnDelete(DeleteBehavior.Cascade);
 

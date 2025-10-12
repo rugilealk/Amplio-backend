@@ -6,21 +6,21 @@ namespace PSI.Services
 {
     public class SongService
     {
-        private readonly AppDbContext databaseContext;
+        private readonly AppDbContext _databaseContext;
 
         public SongService(AppDbContext databaseContext)
         {
-            this.databaseContext = databaseContext;
+            _databaseContext = databaseContext;
         }
 
         public async Task<IEnumerable<Song>> GetAllSongsAsync()
         {
-            return await databaseContext.Songs.ToListAsync();
+            return await _databaseContext.Songs.ToListAsync();
         }
 
         public async Task<Song?> GetSongByIdAsync(Guid songId)
         {
-            return await databaseContext.Songs.FindAsync(songId);
+            return await _databaseContext.Songs.FindAsync(songId);
         }
     }
 }
