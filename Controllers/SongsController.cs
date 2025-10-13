@@ -32,24 +32,13 @@ namespace PSI.Controllers
         [HttpGet("play/{songId:guid}")]
         public async Task<IActionResult> PlaySong(Guid songId)
         {
-            var song = await _songService.GetSongByIdAsync(songId);
-            if (song == null)
+            var result = await _songService.GetSongStreamAsync(songId);
+            if (!result.Success)
             {
-                return NotFound();
+                return NotFound(result.ErrorMessage);
             }
 
-            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", song.FilePath.Value);
-            fullPath = Path.GetFullPath(fullPath);
-          
-            if (!System.IO.File.Exists(fullPath))
-            {
-                return NotFound("File not found" + fullPath);
-            }
-
-            var fileStream = song.OpenStream();
-            var contentType = "audio/mpeg";
-            return File(fileStream, contentType, Path.GetFileName(fullPath));
+            return File(result.Stream, result.ContentType, result.FileName);
         }
-
     }
 }
