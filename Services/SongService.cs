@@ -7,10 +7,12 @@ namespace PSI.Services
     public class SongService
     {
         private readonly AppDbContext _databaseContext;
+        private readonly HttpClient _httpClient;
 
-        public SongService(AppDbContext databaseContext)
+        public SongService(AppDbContext databaseContext, HttpClient httpClient)
         {
             _databaseContext = databaseContext;
+            _httpClient = httpClient;
         }
 
         public async Task<IEnumerable<Song>> GetAllSongsAsync()
@@ -31,19 +33,15 @@ namespace PSI.Services
                 return (false, "Song not found", null, string.Empty, string.Empty);
             }
 
-            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", song.FilePath.Value);
-            fullPath = Path.GetFullPath(fullPath);
-
-            if (!System.IO.File.Exists(fullPath))
+            try
             {
-                return (false, $"File not found: {fullPath}", null, string.Empty, string.Empty);
+                var stream = await song.OpenStreamAsync(_httpClient);
+                return (true, null, stream, "audio/mpeg", $"{song.Title}.mp3");
             }
-
-            var fileStream = song.OpenStream();
-            var contentType = "audio/mpeg";
-            var fileName = Path.GetFileName(fullPath);
-
-            return (true, null, fileStream, contentType, fileName);
+            catch (Exception ex)
+            {
+                return (false, ex.Message, null, string.Empty, string.Empty);
+            }
         }
     }
 }

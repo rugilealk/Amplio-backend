@@ -1,7 +1,3 @@
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 namespace PSI.Models
 {
     public class Song
@@ -10,24 +6,22 @@ namespace PSI.Models
         public string Title { get; set; } = string.Empty;
         public string Artist { get; set; } = string.Empty;
         public List<Genre> Genres { get; set; } = new List<Genre>();
-        public FilePath FilePath { get; set; }
+        public string Link { get; set; } = string.Empty;
 
-
-        public Stream OpenStream()
+        public async Task<Stream> OpenStreamAsync(HttpClient httpClient)
         {
-            if (string.IsNullOrEmpty(FilePath.Value))
+            if (string.IsNullOrEmpty(Link))
             {
-                throw new InvalidOperationException("File path for this song is not set.");
+                throw new InvalidOperationException("Google Drive link for this song is not set.");
             }
 
-            var fullPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", FilePath.Value);
-            fullPath = Path.GetFullPath(fullPath);
+            var response = await httpClient.GetAsync(Link);
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException($"Failed to fetch the song from Google Drive. Status code: {response.StatusCode}");
+            }
 
-            if (!System.IO.File.Exists(fullPath))
-                throw new FileNotFoundException("Song file not found." + fullPath);
-
-            // Open the file for reading and return the stream
-            return new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            return await response.Content.ReadAsStreamAsync();
         }
     }
 }

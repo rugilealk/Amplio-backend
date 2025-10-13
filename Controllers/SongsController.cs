@@ -38,6 +38,11 @@ namespace PSI.Controllers
                 return NotFound(result.ErrorMessage);
             }
 
+            if (result.Stream == null)
+            {
+                return NotFound("Stream could not be opened.");
+            }
+
             return File(result.Stream, result.ContentType, result.FileName);
         }
     }
