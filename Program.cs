@@ -14,7 +14,6 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
     });
 
-builder.Services.AddHttpClient();
 builder.Services.AddScoped<SongService>();
 builder.Services.AddScoped<PlaylistService>();
 builder.Services.AddControllers()

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PSI.Services;
-using PSI.Models;
 
 namespace PSI.Controllers
 {
@@ -30,20 +29,15 @@ namespace PSI.Controllers
         }
 
         [HttpGet("play/{songId:guid}")]
-        public async Task<IActionResult> PlaySong(Guid songId)
+        public async Task<IActionResult> GetSongLink(Guid songId)
         {
-            var result = await _songService.GetSongStreamAsync(songId);
-            if (!result.Success)
-            {
-                return NotFound(result.ErrorMessage);
-            }
+            var song = await _songService.GetSongByIdAsync(songId);
+            if (song == null)
+                return NotFound("Song not found");
 
-            if (result.Stream == null)
-            {
-                return NotFound("Stream could not be opened.");
-            }
-
-            return File(result.Stream, result.ContentType, result.FileName);
+            var directLink = _songService.ConvertDriveLink(song.Link);
+            return Ok(new { link = directLink });
         }
+
     }
 }

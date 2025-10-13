@@ -1,18 +1,29 @@
-using PSI.Models;
 using Microsoft.EntityFrameworkCore;
 using PSI.Data;
+using PSI.Models;
+using System.Text.RegularExpressions;
 
 namespace PSI.Services
 {
     public class SongService
     {
         private readonly AppDbContext _databaseContext;
-        private readonly HttpClient _httpClient;
 
         public SongService(AppDbContext databaseContext, HttpClient httpClient)
         {
             _databaseContext = databaseContext;
-            _httpClient = httpClient;
+        }
+
+        public string ConvertDriveLink(string link)
+        {
+            var match = Regex.Match(link, @"\/d\/([a-zA-Z0-9_-]+)\/");
+            if (!match.Success)
+            {
+                throw new InvalidOperationException("Invalid Google Drive link format");
+            }
+
+            var fileId = match.Groups[1].Value;
+            return $"https://drive.google.com/uc?export=download&id={fileId}";
         }
 
         public async Task<IEnumerable<Song>> GetAllSongsAsync()
@@ -25,23 +36,5 @@ namespace PSI.Services
             return await _databaseContext.Songs.FindAsync(songId);
         }
 
-        public async Task<(bool Success, string? ErrorMessage, Stream? Stream, string ContentType, string FileName)> GetSongStreamAsync(Guid songId)
-        {
-            var song = await GetSongByIdAsync(songId);
-            if (song == null)
-            {
-                return (false, "Song not found", null, string.Empty, string.Empty);
-            }
-
-            try
-            {
-                var stream = await song.OpenStreamAsync(_httpClient);
-                return (true, null, stream, "audio/mpeg", $"{song.Title}.mp3");
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message, null, string.Empty, string.Empty);
-            }
-        }
     }
 }
