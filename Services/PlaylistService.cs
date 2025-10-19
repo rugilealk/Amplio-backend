@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PSI.Data;
 using PSI.Models;
+using PSI.Extensions;
 
 namespace PSI.Services
 {
@@ -55,19 +56,20 @@ namespace PSI.Services
             await _databaseContext.SaveChangesAsync();
         }
 
-        public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
+        //pakeistas su extention kad veiktu
+    public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
-            var song = playlist.GetSongById(songId)
-                ?? throw new KeyNotFoundException("Song not found in playlist");
+            if (!playlist.UpvoteSongById(songId))
+                throw new KeyNotFoundException("Song not found in playlist");
 
-            song.Upvote();
             await _databaseContext.SaveChangesAsync();
             return playlist.GetAllSongs();
         }
 
-        public async Task<Song> SetCurrentSongAsync(Guid playlistId, Guid songId)
+
+    public async Task<Song> SetCurrentSongAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
