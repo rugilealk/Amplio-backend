@@ -56,6 +56,18 @@ namespace PSI.Controllers
             var result = await _playlistService.UpvoteSongInPlaylistAsync(playlistId, songId);
             return result.Success ? Ok(result.Songs) : NotFound(result.ErrorMessage);
         }
+
+        [HttpPost("{playlistId:guid}/play/{songId:guid}")]
+        public async Task<IActionResult> GetCurrentSong(Guid playlistId, Guid songId)
+        {
+            var result = await _playlistService.SetCurrentSongAsync(playlistId, songId);
+            if (!result.Success)
+            {
+                return NotFound(result.ErrorMessage);
+            }
+
+            return Ok(result.CurrentSong);
+        }
     }
 }
 

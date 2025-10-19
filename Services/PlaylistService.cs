@@ -75,5 +75,21 @@ namespace PSI.Services
                 .ThenInclude(ps => ps.Song)
                 .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
         }
+        public async Task<(bool Success, string? ErrorMessage, Song? CurrentSong)> SetCurrentSongAsync(Guid playlistId, Guid songId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+            if (playlist == null) return (false, "Playlist not found", null);
+
+            var playlistSong = playlist.Songs.FirstOrDefault(ps => ps.SongId == songId);
+            if (playlistSong == null) return (false, "Song not found in playlist", null);
+
+            playlist.CurrentSong = playlistSong.Song;
+
+            bool wasDeleted = playlist.DeleteSong(songId);
+            if (!wasDeleted) return (false, "Song not found in playlist", null);
+
+            await _databaseContext.SaveChangesAsync();
+            return (true, null, playlist.CurrentSong);
+        }
     }
 }
