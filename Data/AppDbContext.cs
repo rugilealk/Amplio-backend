@@ -35,7 +35,7 @@ namespace PSI.Data
                 .HasForeignKey(playlistSong => playlistSong.SongId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Optional: Configure string property lengths and requirements
+            // Configure string property lengths and requirements
             modelBuilder.Entity<Song>()
                 .Property(song => song.Title)
                 .IsRequired()
@@ -47,20 +47,20 @@ namespace PSI.Data
                 .HasMaxLength(100);
 
             modelBuilder.Entity<Song>()
-               .Property(s => s.Link)
-               .IsRequired()
-               .HasMaxLength(255);
+                .Property(song => song.Link)
+                .IsRequired()
+                .HasMaxLength(255);
 
-            // will convert the enumerable list into json string for storage    
+            // Convert the enumerable list into JSON string for storage
             modelBuilder.Entity<Song>()
-                .Property(s => s.Genres)
+                .Property(song => song.Genres)
                 .HasConversion(
-                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                    v => JsonSerializer.Deserialize<List<Genre>>(
-                        v,
+                    genres => JsonSerializer.Serialize(genres, (JsonSerializerOptions)null),
+                    genresJson => JsonSerializer.Deserialize<List<Genre>>(
+                        genresJson,
                         new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
                     ) ?? new List<Genre>()
-    );
+                );
         }
     }
 }
