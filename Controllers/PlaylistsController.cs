@@ -9,66 +9,90 @@ namespace PSI.Controllers
     public class PlaylistsController : ControllerBase
     {
         private readonly PlaylistService _playlistService;
-        private readonly SongService _songService;
 
-        public PlaylistsController(PlaylistService playlistService, SongService songService)
+        public PlaylistsController(PlaylistService playlistService)
         {
             _playlistService = playlistService;
-            _songService = songService;
         }
 
         [HttpPost]
         public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
-            {
                 return BadRequest("Playlist name cannot be empty.");
-            }
 
-            var createdPlaylist = await _playlistService.CreatePlaylistAsync(request.Name);
-            return Created($"/playlist/{createdPlaylist.PlaylistId}", new { createdPlaylist.PlaylistId, createdPlaylist.Name });
+            var playlist = await _playlistService.CreatePlaylistAsync(request.Name);
+            return Created($"/playlist/{playlist.PlaylistId}", new { playlist.PlaylistId, playlist.Name });
         }
 
         [HttpGet("{playlistId:guid}")]
         public async Task<IActionResult> GetSongsInPlaylist(Guid playlistId)
         {
-            var songs = await _playlistService.GetSongsInPlaylistAsync(playlistId);
-            return songs is not null ? Ok(songs) : NotFound();
+            try
+            {
+                var songs = await _playlistService.GetSongsInPlaylistAsync(playlistId);
+                return Ok(songs);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPost("{playlistId:guid}/add/{songId:guid}")]
         public async Task<IActionResult> AddSongToPlaylist(Guid playlistId, Guid songId)
         {
-            var result = await _playlistService.AddSongToPlaylistAsync(playlistId, songId);
-            return result.Success ? Ok(result.Songs) : NotFound(result.ErrorMessage);
+            try
+            {
+                var songs = await _playlistService.AddSongToPlaylistAsync(playlistId, songId);
+                return Ok(songs);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpDelete("{playlistId:guid}/delete/{songId:guid}")]
         public async Task<IActionResult> RemoveSongFromPlaylist(Guid playlistId, Guid songId)
         {
-            var result = await _playlistService.RemoveSongFromPlaylistAsync(playlistId, songId);
-            return result.Success ? Ok() : NotFound(result.ErrorMessage);
+            try
+            {
+                await _playlistService.RemoveSongFromPlaylistAsync(playlistId, songId);
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPost("{playlistId:guid}/vote/{songId:guid}")]
         public async Task<IActionResult> UpvoteSongInPlaylist(Guid playlistId, Guid songId)
         {
-            var result = await _playlistService.UpvoteSongInPlaylistAsync(playlistId, songId);
-            return result.Success ? Ok(result.Songs) : NotFound(result.ErrorMessage);
+            try
+            {
+                var songs = await _playlistService.UpvoteSongInPlaylistAsync(playlistId, songId);
+                return Ok(songs);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPost("{playlistId:guid}/play/{songId:guid}")]
-        public async Task<IActionResult> GetCurrentSong(Guid playlistId, Guid songId)
+        public async Task<IActionResult> SetCurrentSong(Guid playlistId, Guid songId)
         {
-            var result = await _playlistService.SetCurrentSongAsync(playlistId, songId);
-            if (!result.Success)
+            try
             {
-                return NotFound(result.ErrorMessage);
+                var currentSong = await _playlistService.SetCurrentSongAsync(playlistId, songId);
+                return Ok(currentSong);
             }
-
-            return Ok(result.CurrentSong);
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }
-
-

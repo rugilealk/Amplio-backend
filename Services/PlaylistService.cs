@@ -17,79 +17,79 @@ namespace PSI.Services
 
         public async Task<Playlist> CreatePlaylistAsync(string name)
         {
-            var newPlaylist = new Playlist(name);
-            _databaseContext.Playlists.Add(newPlaylist);
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Playlist name cannot be empty", nameof(name));
+
+            var playlist = new Playlist(name);
+            _databaseContext.Playlists.Add(playlist);
             await _databaseContext.SaveChangesAsync();
-            return newPlaylist;
+            return playlist;
         }
 
-        public async Task<List<PlaylistSong>?> GetSongsInPlaylistAsync(Guid playlistId)
+        public async Task<List<PlaylistSong>> GetSongsInPlaylistAsync(Guid playlistId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+            return playlist.GetAllSongs();
+        }
+
+        public async Task<List<PlaylistSong>> AddSongToPlaylistAsync(Guid playlistId, Guid songId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+            var song = await _songService.GetSongByIdAsync(songId)
+                ?? throw new KeyNotFoundException("Song not found");
+
+            playlist.AddSong(song);
+            await _databaseContext.SaveChangesAsync();
+            return playlist.GetAllSongs();
+        }
+
+        public async Task RemoveSongFromPlaylistAsync(Guid playlistId, Guid songId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+
+            if (!playlist.DeleteSong(songId))
+            {
+                throw new KeyNotFoundException("Song not found in playlist");
+            }
+
+            await _databaseContext.SaveChangesAsync();
+        }
+
+        public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+
+            var song = playlist.GetSongById(songId)
+                ?? throw new KeyNotFoundException("Song not found in playlist");
+
+            song.Upvote();
+            await _databaseContext.SaveChangesAsync();
+            return playlist.GetAllSongs();
+        }
+
+        public async Task<Song> SetCurrentSongAsync(Guid playlistId, Guid songId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+
+            var playlistSong = playlist.GetSongById(songId)
+                ?? throw new KeyNotFoundException("Song not found in playlist");
+
+            playlist.CurrentSong = playlistSong.Song;
+
+            playlist.DeleteSong(songId);
+
+            await _databaseContext.SaveChangesAsync();
+            return playlist.CurrentSong;
+        }
+
+        private async Task<Playlist> GetPlaylistByIdAsync(Guid playlistId)
         {
             var playlist = await _databaseContext.Playlists
                 .Include(p => p.Songs)
                 .ThenInclude(ps => ps.Song)
                 .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
 
-            return playlist?.GetAllSongs();
-        }
-
-        public async Task<(bool Success, string? ErrorMessage, List<PlaylistSong>? Songs)> AddSongToPlaylistAsync(Guid playlistId, Guid songId)
-        {
-            var playlist = await GetPlaylistByIdAsync(playlistId);
-            if (playlist == null) return (false, "Playlist not found", null);
-
-            var song = await _songService.GetSongByIdAsync(songId);
-            if (song == null) return (false, "Song not found", null);
-
-            playlist.AddSong(song);
-            await _databaseContext.SaveChangesAsync();
-            return (true, null, playlist.GetAllSongs());
-        }
-
-        public async Task<(bool Success, string? ErrorMessage)> RemoveSongFromPlaylistAsync(Guid playlistId, Guid songId)
-        {
-            var playlist = await GetPlaylistByIdAsync(playlistId);
-            if (playlist == null) return (false, "Playlist not found");
-
-            var wasDeleted = playlist.DeleteSong(songId);
-            if (!wasDeleted) return (false, "Song not found in playlist");
-
-            await _databaseContext.SaveChangesAsync();
-            return (true, null);
-        }
-
-        public async Task<(bool Success, string? ErrorMessage, List<PlaylistSong>? Songs)> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
-        {
-            var playlist = await GetPlaylistByIdAsync(playlistId);
-            if (playlist == null) return (false, "Playlist not found", null);
-
-            playlist.UpvoteSong(songId);
-            await _databaseContext.SaveChangesAsync();
-            return (true, null, playlist.GetAllSongs());
-        }
-
-        private async Task<Playlist?> GetPlaylistByIdAsync(Guid playlistId)
-        {
-            return await _databaseContext.Playlists
-                .Include(p => p.Songs)
-                .ThenInclude(ps => ps.Song)
-                .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
-        }
-        public async Task<(bool Success, string? ErrorMessage, Song? CurrentSong)> SetCurrentSongAsync(Guid playlistId, Guid songId)
-        {
-            var playlist = await GetPlaylistByIdAsync(playlistId);
-            if (playlist == null) return (false, "Playlist not found", null);
-
-            var playlistSong = playlist.Songs.FirstOrDefault(ps => ps.SongId == songId);
-            if (playlistSong == null) return (false, "Song not found in playlist", null);
-
-            playlist.CurrentSong = playlistSong.Song;
-
-            bool wasDeleted = playlist.DeleteSong(songId);
-            if (!wasDeleted) return (false, "Song not found in playlist", null);
-
-            await _databaseContext.SaveChangesAsync();
-            return (true, null, playlist.CurrentSong);
+            return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
     }
 }
