@@ -39,5 +39,12 @@ namespace PSI.Controllers
             return Ok(new { link = directLink });
         }
 
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadSongs()
+        {
+            var songs = await _songService.ImportSongsFromFileAsync();
+
+            return Ok(songs);
+        }
     }
 }

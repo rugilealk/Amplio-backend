@@ -8,6 +8,8 @@ namespace PSI.Models
 		Classical,
 		HipHop,
 		Electronic,
-		Rap
-	}
+		Rap,
+		Indie,
+        Alternative
+    }
 }
