@@ -62,7 +62,7 @@ namespace PSI.Services
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
             if (!playlist.UpvoteSongById(songId))
-                throw new KeyNotFoundException("Song not found in playlist");
+                throw new KeyNotFoundException("Song not found in playlist"); //panaudojamas extension, kad patikrinti ar daina egzistuoja
 
             await _databaseContext.SaveChangesAsync();
             return playlist.GetAllSongs();
