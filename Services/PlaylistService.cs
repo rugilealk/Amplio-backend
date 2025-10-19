@@ -56,13 +56,13 @@ namespace PSI.Services
             await _databaseContext.SaveChangesAsync();
         }
 
-        //pakeistas su extention kad veiktu
-    public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
+        //extention method usage
+        public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
             if (!playlist.UpvoteSongById(songId))
-                throw new KeyNotFoundException("Song not found in playlist"); //panaudojamas extension, kad patikrinti ar daina egzistuoja
+                throw new KeyNotFoundException("Song not found in playlist");
 
             await _databaseContext.SaveChangesAsync();
             return playlist.GetAllSongs();
@@ -87,9 +87,9 @@ namespace PSI.Services
         private async Task<Playlist> GetPlaylistByIdAsync(Guid playlistId)
         {
             var playlist = await _databaseContext.Playlists
-                .Include(p => p.Songs)
-                .ThenInclude(ps => ps.Song)
-                .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
+                .Include(playlist => playlist.Songs)
+                .ThenInclude(playlistSong => playlistSong.Song)
+                .FirstOrDefaultAsync(playlist => playlist.PlaylistId == playlistId);
 
             return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
