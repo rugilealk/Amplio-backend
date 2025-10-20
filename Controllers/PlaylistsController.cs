@@ -81,17 +81,17 @@ namespace PSI.Controllers
             }
         }
 
-        [HttpPost("{playlistId:guid}/play/{songId:guid}")]
-        public async Task<IActionResult> SetCurrentSong(Guid playlistId, Guid songId)
+        [HttpPost("{playlistId:guid}/play")]
+        public async Task<IActionResult> SetCurrentSong(Guid playlistId)
         {
             try
             {
-                var currentSong = await _playlistService.SetCurrentSongAsync(playlistId, songId);
+                var currentSong = await _playlistService.SetCurrentSongAsync(playlistId);
                 return Ok(currentSong);
             }
-            catch (KeyNotFoundException ex)
+            catch (InvalidOperationException ex)
             {
-                return NotFound(ex.Message);
+                return BadRequest(ex.Message);
             }
         }
 

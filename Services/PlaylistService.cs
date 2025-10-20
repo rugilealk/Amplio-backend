@@ -69,16 +69,21 @@ namespace PSI.Services
         }
 
 
-        public async Task<Song> SetCurrentSongAsync(Guid playlistId, Guid songId)
+        public async Task<Song> SetCurrentSongAsync(Guid playlistId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
-            var playlistSong = playlist.GetSongById(songId)
-                ?? throw new KeyNotFoundException("Song not found in playlist");
+            var playlistSongs = playlist.GetAllSongs();
 
-            playlist.CurrentSong = playlistSong.Song;
+            if (!playlistSongs.Any())
+            {
+                throw new InvalidOperationException("No songs available in the playlist to set as current.");
+            }
 
-            playlist.DeleteSong(songId);
+            var topSong = playlistSongs.First().Song;
+            playlist.CurrentSong = topSong;
+
+            playlist.DeleteSong(topSong.Id);
 
             await _databaseContext.SaveChangesAsync();
             return playlist.CurrentSong;
