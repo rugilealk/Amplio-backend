@@ -16,7 +16,7 @@ namespace PSI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistRequest request)
+        public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistRequestDto request)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
                 return BadRequest("Playlist name cannot be empty.");

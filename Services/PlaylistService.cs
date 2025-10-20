@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PSI.Data;
 using PSI.Models;
+using PSI.Extensions;
 
 namespace PSI.Services
 {
@@ -55,19 +56,20 @@ namespace PSI.Services
             await _databaseContext.SaveChangesAsync();
         }
 
+        //extention method usage
         public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
-            var song = playlist.GetSongById(songId)
-                ?? throw new KeyNotFoundException("Song not found in playlist");
+            if (!playlist.UpvoteSongById(songId))
+                throw new KeyNotFoundException("Song not found in playlist");
 
-            song.Upvote();
             await _databaseContext.SaveChangesAsync();
             return playlist.GetAllSongs();
         }
 
-        public async Task<Song> SetCurrentSongAsync(Guid playlistId, Guid songId)
+
+    public async Task<Song> SetCurrentSongAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
@@ -85,9 +87,9 @@ namespace PSI.Services
         private async Task<Playlist> GetPlaylistByIdAsync(Guid playlistId)
         {
             var playlist = await _databaseContext.Playlists
-                .Include(p => p.Songs)
-                .ThenInclude(ps => ps.Song)
-                .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
+                .Include(playlist => playlist.Songs)
+                .ThenInclude(playlistSong => playlistSong.Song)
+                .FirstOrDefaultAsync(playlist => playlist.PlaylistId == playlistId);
 
             return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
