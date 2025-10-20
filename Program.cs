@@ -4,6 +4,16 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy => policy
+        .WithOrigins("http://localhost:5173") // React app URL
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+});
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -25,8 +35,10 @@ builder.Services.AddControllers()
         // Avoid $id/$values for navigation properties
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
+app.UseCors("AllowReactApp");
 
 app.UseHttpsRedirection();
 
