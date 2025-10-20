@@ -16,18 +16,6 @@ namespace PSI.Services
             _databaseContext = databaseContext;
         }
 
-        public string ConvertDriveLink(string link)
-        {
-            Match match = Regex.Match(link, @"\/d\/([a-zA-Z0-9_-]+)\/");
-            if (!match.Success)
-            {
-                throw new InvalidOperationException("Invalid Google Drive link format");
-            }
-
-            var fileId = match.Groups[1].Value;
-            return $"https://drive.google.com/uc?export=download&id={fileId}";
-        }
-
         public async Task<IEnumerable<Song>> GetAllSongsAsync()
         {
             return await _databaseContext.Songs.ToListAsync();
