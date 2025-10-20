@@ -35,8 +35,7 @@ namespace PSI.Controllers
             if (song == null)
                 return NotFound("Song not found");
 
-            var directLink = _songService.ConvertDriveLink(song.Link);
-            return Ok(new { link = directLink });
+            return Ok(new { link = song.Link }); //???? gal graziau pakeist
         }
 
         [HttpPost("upload")]
