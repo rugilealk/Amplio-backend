@@ -69,7 +69,7 @@ namespace PSI.Services
         }
 
 
-    public async Task<Song> SetCurrentSongAsync(Guid playlistId, Guid songId)
+        public async Task<Song> SetCurrentSongAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
@@ -84,9 +84,16 @@ namespace PSI.Services
             return playlist.CurrentSong;
         }
 
+        public async Task<Song?> GetCurrentSongAsync(Guid playlistId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+            return playlist.CurrentSong;
+        }
+
         private async Task<Playlist> GetPlaylistByIdAsync(Guid playlistId)
         {
             var playlist = await _databaseContext.Playlists
+                .Include(playlist => playlist.CurrentSong)
                 .Include(playlist => playlist.Songs)
                 .ThenInclude(playlistSong => playlistSong.Song)
                 .FirstOrDefaultAsync(playlist => playlist.PlaylistId == playlistId);

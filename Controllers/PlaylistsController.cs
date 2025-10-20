@@ -94,5 +94,19 @@ namespace PSI.Controllers
                 return NotFound(ex.Message);
             }
         }
+
+        [HttpGet("{playlistId:guid}/current")]
+        public async Task<IActionResult> GetCurrentSong(Guid playlistId)
+        {
+            try
+            {
+                var currentSong = await _playlistService.GetCurrentSongAsync(playlistId);
+                return Ok(currentSong);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }
