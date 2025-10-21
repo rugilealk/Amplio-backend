@@ -2,7 +2,7 @@
 
 namespace PSI.DTOs
 {
-    public class SongDto
+    public record SongDto
     {
         public string Title { get; set; } = string.Empty;
         public string Artist { get; set; } = string.Empty;
