@@ -28,6 +28,20 @@ namespace PSI.Services
 
         public async Task<List<Song>> ImportSongsFromFileAsync()
         {
+            var playlists = _databaseContext.Playlists.ToList();
+            foreach (var playlist in playlists)
+            {
+                playlist.CurrentSongId = null;
+            }
+            await _databaseContext.SaveChangesAsync();
+
+            var playlistSongs = _databaseContext.PlaylistSongs.ToList();
+            if (playlistSongs.Any())
+            {
+                _databaseContext.PlaylistSongs.RemoveRange(playlistSongs);
+                await _databaseContext.SaveChangesAsync();
+            }
+
             List<Song> existingSongs = _databaseContext.Songs.ToList();
             if (existingSongs.Any())
             {
