@@ -5,6 +5,7 @@ using PSI.Models;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
+
 namespace PSI.Services
 {
     public class SongService
@@ -63,6 +64,8 @@ namespace PSI.Services
 
             if (songDtos == null) return new List<Song>();
 
+
+            // iterating the right way
             List<Song> songs = new List<Song>();
             foreach (SongDto dto in songDtos)
             {
@@ -70,7 +73,7 @@ namespace PSI.Services
                 {
                     Title = dto.Title,
                     Artist = dto.Artist,
-                    Link = dto.Link,
+                    Link = new SongLink(dto.Link),
                     Genres = dto.Genres.ToList()
                 };
                 songs.Add(song);

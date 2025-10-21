@@ -6,6 +6,7 @@ namespace PSI.Models
         public string Title { get; set; } = string.Empty;
         public string Artist { get; set; } = string.Empty;
         public List<Genre> Genres { get; set; } = new List<Genre>();
-        public string Link { get; set; } = string.Empty;
+        public SongLink Link { get; set; } = new SongLink();
+
     }
 }
