@@ -54,13 +54,16 @@ namespace PSI.Services
 
             var existingSongs = _databaseContext.Songs.ToList();
             _databaseContext.Songs.RemoveRange(existingSongs);
-
-            await _databaseContext.SaveChangesAsync();
         }
 
         private async Task<List<SongDto>?> LoadSongsFromFileAsync()
         {
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "DummyData", "songs.json");
+            string filePath = Path.Combine(
+                path1: Directory.GetCurrentDirectory(),
+                path2: "DummyData",
+                path3: "songs.json"
+            );
+
             using Stream fileStream = File.OpenRead(filePath);
 
             var options = new JsonSerializerOptions();
