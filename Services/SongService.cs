@@ -4,7 +4,6 @@ using PSI.DTOs;
 using PSI.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 
 namespace PSI.Services
 {
@@ -63,7 +62,6 @@ namespace PSI.Services
         {
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "DummyData", "songs.json");
             using Stream fileStream = File.OpenRead(filePath);
-            fileStream.Position = 0;
 
             var options = new JsonSerializerOptions();
             options.Converters.Add(new JsonStringEnumConverter());
@@ -80,7 +78,7 @@ namespace PSI.Services
                 {
                     Title = dto.Title,
                     Artist = dto.Artist,
-                    Link = dto.Link,
+                    Link = new SongLink(dto.Link),
                     Genres = dto.Genres.ToList()
                 };
                 songs.Add(song);

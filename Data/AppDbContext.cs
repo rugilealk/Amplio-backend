@@ -37,9 +37,14 @@ namespace PSI.Data
 
             // Configure string property lengths and requirements
             modelBuilder.Entity<Song>()
-                .Property(song => song.Title)
+                .Property(s => s.Link)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasConversion(
+                    link => link.ToString(),
+                    value => new SongLink(value)
+                )
+                .HasMaxLength(255);
+
 
             modelBuilder.Entity<Song>()
                 .Property(song => song.Artist)

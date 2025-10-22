@@ -16,12 +16,16 @@ namespace PSI.Services
             _songService = songService;
         }
 
-        public async Task<Playlist> CreatePlaylistAsync(string name)
+        public async Task<Playlist> CreatePlaylistAsync(string name, Guid? currentSongId = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Playlist name cannot be empty", nameof(name));
 
-            var playlist = new Playlist(name);
+            var playlist = new Playlist(name)
+            {
+                CurrentSongId = currentSongId
+            };
+
             _databaseContext.Playlists.Add(playlist);
             await _databaseContext.SaveChangesAsync();
             return playlist;

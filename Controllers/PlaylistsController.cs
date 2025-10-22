@@ -21,9 +21,10 @@ namespace PSI.Controllers
             if (string.IsNullOrWhiteSpace(request.Name))
                 return BadRequest("Playlist name cannot be empty.");
 
-            var playlist = await _playlistService.CreatePlaylistAsync(request.Name);
-            return Created($"/playlist/{playlist.PlaylistId}", new { playlist.PlaylistId, playlist.Name });
+            var playlist = await _playlistService.CreatePlaylistAsync(request.Name, request.CurrentSongId);
+            return Created($"/playlist/{playlist.PlaylistId}", new { playlist.PlaylistId, playlist.Name, playlist.CurrentSongId });
         }
+
 
         [HttpGet("{playlistId:guid}")]
         public async Task<IActionResult> GetSongsInPlaylist(Guid playlistId)
