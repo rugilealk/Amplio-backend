@@ -60,7 +60,7 @@ namespace PSI.Services
             await _databaseContext.SaveChangesAsync();
         }
 
-        //extention method usage
+        //extension method usage
         public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
