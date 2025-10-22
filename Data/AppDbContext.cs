@@ -56,15 +56,11 @@ namespace PSI.Data
                 .IsRequired()
                 .HasMaxLength(255);
 
-            // Convert the enumerable list into JSON string for storage
             modelBuilder.Entity<Song>()
                 .Property(song => song.Genres)
                 .HasConversion(
                     genres => JsonSerializer.Serialize(genres, (JsonSerializerOptions)null),
-                    genresJson => JsonSerializer.Deserialize<List<Genre>>(
-                        genresJson,
-                        new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } }
-                    ) ?? new List<Genre>()
+                    genresJson => JsonSerializer.Deserialize<List<Genre>>(genresJson, (JsonSerializerOptions)null) ?? new List<Genre>()
                 );
         }
     }

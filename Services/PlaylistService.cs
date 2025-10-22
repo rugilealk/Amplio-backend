@@ -31,8 +31,6 @@ namespace PSI.Services
             return playlist;
         }
 
-
-
         public async Task<List<PlaylistSong>> GetSongsInPlaylistAsync(Guid playlistId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);

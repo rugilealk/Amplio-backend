@@ -3,8 +3,7 @@ using PSI.Data;
 using PSI.DTOs;
 using PSI.Models;
 using System.Text.Json;
-using System.Text.RegularExpressions;
-
+using System.Text.Json.Serialization;
 
 namespace PSI.Services
 {
@@ -29,44 +28,53 @@ namespace PSI.Services
 
         public async Task<List<Song>> ImportSongsFromFileAsync()
         {
-            var playlists = _databaseContext.Playlists.ToList();
-            foreach (var playlist in playlists)
+            await ClearExistingDataAsync();
+
+            List<SongDto>? songDtos = await LoadSongsFromFileAsync();
+
+            if (songDtos == null)
             {
-                playlist.CurrentSongId = null;
+                throw new InvalidOperationException($"Failed to deserialize songs from file:");
             }
+
+            List<Song> songs = MapDtosToEntities(songDtos);
+            _databaseContext.Songs.AddRange(songs);
+
             await _databaseContext.SaveChangesAsync();
+            return songs;
+        }
+
+        private async Task ClearExistingDataAsync()
+        {
+            var playlists = await _databaseContext.Playlists.ToListAsync();
+            playlists.ForEach(p => p.CurrentSongId = null);
 
             var playlistSongs = _databaseContext.PlaylistSongs.ToList();
-            if (playlistSongs.Any())
-            {
-                _databaseContext.PlaylistSongs.RemoveRange(playlistSongs);
-                await _databaseContext.SaveChangesAsync();
-            }
+            _databaseContext.PlaylistSongs.RemoveRange(playlistSongs);
 
-            List<Song> existingSongs = _databaseContext.Songs.ToList();
-            if (existingSongs.Any())
-            {
-                _databaseContext.Songs.RemoveRange(existingSongs);
-                await _databaseContext.SaveChangesAsync();
-            }
+            var existingSongs = _databaseContext.Songs.ToList();
+            _databaseContext.Songs.RemoveRange(existingSongs);
+        }
 
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "DummyData", "songs.json");
+        private async Task<List<SongDto>?> LoadSongsFromFileAsync()
+        {
+            string filePath = Path.Combine(
+                path1: Directory.GetCurrentDirectory(),
+                path2: "DummyData",
+                path3: "songs.json"
+            );
+
             using Stream fileStream = File.OpenRead(filePath);
-            if (fileStream == null) throw new ArgumentNullException(nameof(fileStream));
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new JsonStringEnumConverter());
 
-            List<SongDto>? songDtos = await JsonSerializer.DeserializeAsync<List<SongDto>>(fileStream, options);
-
-            if (songDtos == null) return new List<Song>();
-
-
-            // iterating the right way
-            List<Song> songs = new List<Song>();
+            var songDtos = await JsonSerializer.DeserializeAsync<List<SongDto>>(fileStream, options);
+            return songDtos;
+        }
+        private List<Song> MapDtosToEntities(List<SongDto> songDtos)
+        {
+            var songs = new List<Song>();
             foreach (SongDto dto in songDtos)
             {
                 var song = new Song
@@ -77,10 +85,7 @@ namespace PSI.Services
                     Genres = dto.Genres.ToList()
                 };
                 songs.Add(song);
-                _databaseContext.Songs.Add(song);
             }
-
-            await _databaseContext.SaveChangesAsync();
             return songs;
         }
     }
