@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PSI.Services;
+using System.Text.Json;
 
 namespace PSI.Controllers
 {
@@ -33,17 +34,37 @@ namespace PSI.Controllers
         {
             var song = await _songService.GetSongByIdAsync(songId);
             if (song == null)
+            {
                 return NotFound("Song not found");
+            }
 
-            return Ok(new { link = song.Link }); //???? gal graziau pakeist
+            return Ok(new { link = song.Link });
         }
 
         [HttpPost("upload")]
         public async Task<IActionResult> UploadSongs()
         {
-            var songs = await _songService.ImportSongsFromFileAsync();
-
-            return Ok(songs);
+            try
+            {
+                var songs = await _songService.ImportSongsFromFileAsync();
+                return Ok(songs);
+            }
+            catch (FileNotFoundException ex)
+            {
+                return NotFound(new { error = "Songs file not found", details = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { error = "Failed to import songs", details = ex.Message });
+            }
+            catch (JsonException ex)
+            {
+                return BadRequest(new { error = "Invalid JSON format in songs file", details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "An unexpected error occurred", details = ex.Message });
+            }
         }
     }
 }
