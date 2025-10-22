@@ -12,25 +12,37 @@ namespace PSI.Models
             Value = NormalizeLink(value);
         }
 
-        // This method converts Google Drive links into direct download links
+        // This method converts various YouTube links into a standard watch URL
         private static string NormalizeLink(string link)
         {
             if (string.IsNullOrWhiteSpace(link))
                 return string.Empty;
 
-            const string drivePattern = "/d/";
-            if (link.Contains(drivePattern))
+            try
             {
-                var parts = link.Split('/');
-                int idIndex = Array.IndexOf(parts, "d");
-                if (idIndex >= 0 && idIndex + 1 < parts.Length)
-                {
-                    string fileId = parts[idIndex + 1];
-                    return $"https://drive.google.com/uc?export=download&id={fileId}";
-                }
-            }
+                var uri = new Uri(link);
 
-            return link; // Return unchanged if not a Drive link
+                if (uri.Host.Contains("youtu.be"))
+                {
+                    
+                    string videoId = uri.AbsolutePath.Trim('/');
+                    return $"https://www.youtube.com/watch?v={videoId}";
+                }
+                else if (uri.Host.Contains("youtube.com"))
+                {
+                    
+                    var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                    string videoId = query["v"];
+                    if (!string.IsNullOrEmpty(videoId))
+                        return $"https://www.youtube.com/watch?v={videoId}";
+                }
+
+                return link;
+            }
+            catch
+            {
+                return link;
+            }
         }
 
         public override string ToString() => Value;
