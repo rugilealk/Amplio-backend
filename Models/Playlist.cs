@@ -16,7 +16,7 @@ namespace PSI.Models
         }
         public void AddSong(Song songToAdd)
         {
-            if (Songs.FindById(songToAdd.Id)!=null)
+            if (Songs.FindById(songToAdd.Id)==null)
             {
                 var newPlaylistSong = new PlaylistSong(songToAdd, this);
                 Songs.Add(newPlaylistSong);
