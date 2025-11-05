@@ -8,7 +8,7 @@ namespace PSI.Models
 
         public Song? CurrentSong { get; set; } = null!;
         public string Name { get; set; } = string.Empty;
-        public List<PlaylistSong> Songs { get; set; } = new List<PlaylistSong>();
+        public GenericSongList<PlaylistSong> Songs { get; set; } = new GenericSongList<PlaylistSong>();
 
         public Playlist(string name)
         {
@@ -16,8 +16,7 @@ namespace PSI.Models
         }
         public void AddSong(Song songToAdd)
         {
-            bool songAlreadyExists = Songs.Any(playlistSong => playlistSong.SongId == songToAdd.Id);
-            if (!songAlreadyExists)
+            if (Songs.FindById(songToAdd.Id)==null)
             {
                 var newPlaylistSong = new PlaylistSong(songToAdd, this);
                 Songs.Add(newPlaylistSong);
@@ -25,10 +24,10 @@ namespace PSI.Models
         }
 
         public List<PlaylistSong> GetAllSongs() =>
-            Songs.OrderByDescending(playlistSong => playlistSong.Votes).ToList();
+            Songs.GetOrderedByVotes();
 
         public PlaylistSong? GetSongById(Guid songId) =>
-            Songs.FirstOrDefault(playlistSong => playlistSong.SongId == songId);
+            Songs.FindById(songId);
 
         public bool DeleteSong(Guid songId)
         {
