@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PSI.Data;
 using PSI.Models;
 using PSI.Extensions;
+using PSI.Exceptions;
 
 namespace PSI.Services
 {
@@ -79,11 +80,11 @@ namespace PSI.Services
         public async Task<Song> SetCurrentSongAsync(Guid playlistId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
-
             var playlistSongs = playlist.GetAllSongs();
 
+            // Custom exception used here
             if (!playlistSongs.Any())
-                throw new InvalidOperationException("No songs available in the playlist to set as current.");
+                throw new PlaylistOperationException("Cannot set current song because the playlist is empty.");
 
             var topSong = playlistSongs.First().Song;
             playlist.CurrentSong = topSong;
