@@ -9,11 +9,13 @@ namespace PSI.Services
     {
         private readonly AppDbContext _databaseContext;
         private readonly SongService _songService;
+        private readonly ConcurrentVotingService _votingService;
 
-        public PlaylistService(AppDbContext databaseContext, SongService songService)
+        public PlaylistService(AppDbContext databaseContext, SongService songService, ConcurrentVotingService votingService)
         {
             _databaseContext = databaseContext;
             _songService = songService;
+            _votingService = votingService;
         }
 
         public async Task<Playlist> CreatePlaylistAsync(string name, Guid? currentSongId = null)
@@ -60,18 +62,19 @@ namespace PSI.Services
             await _databaseContext.SaveChangesAsync();
         }
 
-        //extension method usage
         public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
 
-            if (!playlist.UpvoteSongById(songId))
+            var playlistSong = playlist.GetSongById(songId);
+            if (playlistSong == null)
                 throw new KeyNotFoundException("Song not found in playlist");
+
+            _votingService.Upvote(playlistSong);
 
             await _databaseContext.SaveChangesAsync();
             return playlist.GetAllSongs();
         }
-
 
         public async Task<Song> SetCurrentSongAsync(Guid playlistId)
         {
@@ -80,9 +83,7 @@ namespace PSI.Services
             var playlistSongs = playlist.GetAllSongs();
 
             if (!playlistSongs.Any())
-            {
                 throw new InvalidOperationException("No songs available in the playlist to set as current.");
-            }
 
             var topSong = playlistSongs.First().Song;
             playlist.CurrentSong = topSong;
@@ -102,10 +103,10 @@ namespace PSI.Services
         private async Task<Playlist> GetPlaylistByIdAsync(Guid playlistId)
         {
             var playlist = await _databaseContext.Playlists
-                .Include(playlist => playlist.CurrentSong)
-                .Include(playlist => playlist.Songs)
-                .ThenInclude(playlistSong => playlistSong.Song)
-                .FirstOrDefaultAsync(playlist => playlist.PlaylistId == playlistId);
+                .Include(p => p.CurrentSong)
+                .Include(p => p.Songs)
+                .ThenInclude(ps => ps.Song)
+                .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
 
             return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
