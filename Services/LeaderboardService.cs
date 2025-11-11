@@ -15,10 +15,19 @@ namespace PSI.Services
         }
         public async Task<LeaderboardResponseDto<PlaylistLeaderboardDto>> GetPlaylistLeaderboardAsync(int topN = 10)
         {
+            var leaderboard = new GenericLeaderboard<Playlist>();
+
             var playlists = await _databaseContext.Playlists
+                .AsNoTracking()
                 .Where(p => p.IsPublic)
-                .OrderByDescending(p => p.Popularity)
-                .ThenBy(p => p.Name)
+                .ToListAsync();
+
+            foreach (var playlist in playlists)
+            {
+                leaderboard.AddSongCollection(playlist);
+            }
+
+            var sortedPlaylists = leaderboard.GetSortedByPopularity()
                 .Take(topN)
                 .Select(p => new PlaylistLeaderboardDto
                 {
@@ -28,19 +37,28 @@ namespace PSI.Services
                     VisitCount = p.VisitCount,
                     IsPublic = p.IsPublic
                 })
-                .ToListAsync();
+                .ToList();
 
             return new LeaderboardResponseDto<PlaylistLeaderboardDto>
             {
-                LeaderboardItems = playlists
+                LeaderboardItems = sortedPlaylists
             };
         }
 
         public async Task<LeaderboardResponseDto<AlbumLeaderboardDto>> GetAlbumLeaderboardAsync(int topN = 10)
         {
+            var leaderboard = new GenericLeaderboard<Album>();
+
             var albums = await _databaseContext.Albums
-                .OrderByDescending(a => a.Popularity)
-                .ThenBy(a => a.Name)
+                .AsNoTracking()
+                .ToListAsync();
+
+            foreach (var album in albums)
+            {
+                leaderboard.AddSongCollection(album);
+            }
+
+            var sortedAlbums = leaderboard.GetSortedByPopularity()
                 .Take(topN)
                 .Select(a => new AlbumLeaderboardDto
                 {
@@ -50,11 +68,11 @@ namespace PSI.Services
                     ReleaseYear = a.ReleaseYear,
                     Popularity = a.Popularity
                 })
-                .ToListAsync();
+                .ToList();
 
             return new LeaderboardResponseDto<AlbumLeaderboardDto>
             {
-                LeaderboardItems = albums
+                LeaderboardItems = sortedAlbums
             };
         }
     }
