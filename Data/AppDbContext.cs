@@ -10,6 +10,7 @@ namespace PSI.Data
         public DbSet<Song> Songs { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
+        public DbSet<Album> Albums { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -44,6 +45,11 @@ namespace PSI.Data
                     value => new SongLink(value)
                 )
                 .HasMaxLength(255);
+
+            modelBuilder.Entity<SongCollection>()
+            .HasDiscriminator<string>("SongListType")
+            .HasValue<Playlist>("Playlist")
+            .HasValue<Album>("Album");
 
 
             modelBuilder.Entity<Song>()
