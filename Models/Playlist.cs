@@ -18,7 +18,7 @@ namespace PSI.Models
 
         public override void IncreasePopularity()
         {
-            VisitCount++; // nebutina
+            VisitCount++;
             Popularity = VisitCount;
         }
         public void AddSong(Song songToAdd)

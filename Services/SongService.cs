@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PSI.Data;
 using PSI.DTOs;
 using PSI.Models;
@@ -28,19 +28,57 @@ namespace PSI.Services
 
         public async Task<List<Song>> ImportSongsFromFileAsync()
         {
+            // 1️⃣ Clear existing data
             await ClearExistingDataAsync();
 
+            // 2️⃣ Load JSON file
             List<SongDto>? songDtos = await LoadSongsFromFileAsync();
-
             if (songDtos == null)
+                throw new InvalidOperationException("Failed to deserialize songs from file");
+
+            var songs = new List<Song>();
+
+            foreach (var dto in songDtos)
             {
-                throw new InvalidOperationException($"Failed to deserialize songs from file:");
+                Album? albumEntity = null;
+
+                // 3️⃣ Handle album if provided
+                if (dto.Album != null)
+                {
+                    // Check if album already exists in DB
+                    albumEntity = await _databaseContext.Albums
+                        .FirstOrDefaultAsync(a => a.Name == dto.Album.Name && a.Artist == dto.Album.Artist);
+
+                    // Create album if it doesn't exist
+                    if (albumEntity == null)
+                    {
+                        albumEntity = new Album(dto.Album.Name, dto.Album.Artist, dto.Album.ReleaseYear);
+                        _databaseContext.Albums.Add(albumEntity);
+                        await _databaseContext.SaveChangesAsync(); // ensures Album.Id is valid
+                    }
+                }
+
+                // 4️⃣ Create song with correct AlbumId
+                var song = new Song
+                {
+                    Title = dto.Title,
+                    Artist = dto.Artist,
+                    Link = new SongLink(dto.Link),
+                    Genres = dto.Genres.ToList(),
+                    Album = albumEntity,
+                    AlbumId = albumEntity?.Id
+                };
+
+                // 5️⃣ Optional: add song to album's in-memory Songs list
+                albumEntity?.AddSong(song);
+
+                songs.Add(song);
             }
 
-            List<Song> songs = MapDtosToEntities(songDtos);
+            // 6️⃣ Save all songs to DB
             _databaseContext.Songs.AddRange(songs);
-
             await _databaseContext.SaveChangesAsync();
+
             return songs;
         }
 
@@ -54,6 +92,11 @@ namespace PSI.Services
 
             var existingSongs = _databaseContext.Songs.ToList();
             _databaseContext.Songs.RemoveRange(existingSongs);
+
+            var existingAlbums = _databaseContext.Albums.ToList();
+            _databaseContext.Albums.RemoveRange(existingAlbums);
+
+            await _databaseContext.SaveChangesAsync();
         }
 
         private async Task<List<SongDto>?> LoadSongsFromFileAsync()
