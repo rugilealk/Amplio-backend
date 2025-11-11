@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PSI.DTOs;
 using PSI.Services;
+using PSI.Exceptions;
+using System.IO;
 
 namespace PSI.Controllers
 {
@@ -24,7 +26,6 @@ namespace PSI.Controllers
             var playlist = await _playlistService.CreatePlaylistAsync(request.Name, request.CurrentSongId);
             return Created($"/playlist/{playlist.PlaylistId}", new { playlist.PlaylistId, playlist.Name, playlist.CurrentSongId });
         }
-
 
         [HttpGet("{playlistId:guid}")]
         public async Task<IActionResult> GetSongsInPlaylist(Guid playlistId)
@@ -90,9 +91,10 @@ namespace PSI.Controllers
                 var currentSong = await _playlistService.SetCurrentSongAsync(playlistId);
                 return Ok(currentSong);
             }
-            catch (InvalidOperationException ex)
+            catch (PlaylistOperationException ex)
             {
-                return BadRequest(ex.Message);
+                System.IO.File.AppendAllText("logs.txt", $"{DateTime.Now}: {ex.Message}{Environment.NewLine}");
+                return BadRequest(new { error = ex.Message });
             }
         }
 
