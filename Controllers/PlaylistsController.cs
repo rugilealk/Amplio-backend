@@ -111,5 +111,19 @@ namespace PSI.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [HttpPost("{playlistId:guid}/visit")]
+        public async Task<IActionResult> RegisterVisit(Guid playlistId)
+        {
+            try
+            {
+                await _playlistService.IncreasePlaylistPopularityAsync(playlistId);
+                return Ok(new { message = "Playlist visit registered." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
     }
 }

@@ -47,6 +47,16 @@ namespace PSI.Services
                 ?? throw new KeyNotFoundException("Song not found");
 
             playlist.AddSong(song);
+
+            
+            if (song.AlbumId.HasValue)
+            {
+                var album = await _databaseContext.Albums.FindAsync(song.AlbumId.Value);
+                if (album != null)
+                {
+                    album.IncreasePopularity();
+                }
+            }
             await _databaseContext.SaveChangesAsync();
             return playlist.GetAllSongs();
         }
@@ -61,6 +71,17 @@ namespace PSI.Services
             }
 
             await _databaseContext.SaveChangesAsync();
+        }
+
+        public async Task IncreasePlaylistPopularityAsync(Guid playlistId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+            if (playlist == null)
+                throw new KeyNotFoundException("Playlist not found");
+            
+            playlist.IncreasePopularity();
+            await _databaseContext.SaveChangesAsync();
+
         }
 
         public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
@@ -111,5 +132,6 @@ namespace PSI.Services
 
             return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
+
     }
 }

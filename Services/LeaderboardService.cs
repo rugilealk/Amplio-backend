@@ -27,7 +27,9 @@ namespace PSI.Services
                 leaderboard.AddSongCollection(playlist);
             }
 
-            return leaderboard;
+            var sorted = leaderboard.GetSortedByPopularity(topN);
+
+            return new GenericLeaderboard<Playlist> { LeaderboardItems = sorted };
         }
         public async Task<GenericLeaderboard<Album>> GetAlbumLeaderboardAsync(int topN = 10)
         {

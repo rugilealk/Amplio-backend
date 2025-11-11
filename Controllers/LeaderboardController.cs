@@ -15,20 +15,14 @@ namespace PSI.Controllers
         public async Task<IActionResult> GetPlaylistLeaderboard([FromQuery] int topN = 10)
         {
             var leaderboard = await _leaderboardService.GetPlaylistLeaderboardAsync(topN);
-            return Ok(new
-            {
-                items = leaderboard.GetSortedByPopularity()
-            });
+            return Ok(leaderboard);
         }
 
         [HttpGet("albums")]
         public async Task<IActionResult> GetAlbumLeaderboard([FromQuery] int topN = 10)
         {
             var leaderboard = await _leaderboardService.GetAlbumLeaderboardAsync(topN);
-            return Ok(new
-            {
-                items = leaderboard.GetSortedByPopularity()
-            });
+            return Ok(leaderboard);
         }
     }
 }
