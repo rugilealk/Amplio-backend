@@ -46,10 +46,6 @@ namespace PSI.Data
                 )
                 .HasMaxLength(255);
 
-            modelBuilder.Entity<SongCollection>()
-            .HasDiscriminator<string>("SongListType")
-            .HasValue<Playlist>("Playlist")
-            .HasValue<Album>("Album");
 
 
             modelBuilder.Entity<Song>()

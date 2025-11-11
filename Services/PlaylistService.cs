@@ -47,8 +47,6 @@ namespace PSI.Services
                 ?? throw new KeyNotFoundException("Song not found");
 
             playlist.AddSong(song);
-
-            
             if (song.AlbumId.HasValue)
             {
                 var album = await _databaseContext.Albums.FindAsync(song.AlbumId.Value);
@@ -57,6 +55,7 @@ namespace PSI.Services
                     album.IncreasePopularity();
                 }
             }
+
             await _databaseContext.SaveChangesAsync();
             return playlist.GetAllSongs();
         }
