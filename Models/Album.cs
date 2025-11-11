@@ -7,6 +7,7 @@ namespace PSI.Models
         public string Artist { get; set; } = string.Empty;
         public int ReleaseYear { get; set; }
         public List<Song> Songs { get; set; } = new List<Song>();
+        public Album() { }
         public Album(string name, string artist, int releaseYear)
         {
             Name = name;
@@ -16,8 +17,16 @@ namespace PSI.Models
         }
         public override void IncreasePopularity()
         {
-            popularity ++;
+            Popularity++;
         }
-        public override void GetAllSongs() => Songs.ToList();
+        public void AddSong(Song song)
+        {
+            if (!Songs.Any(s => s.Id == song.Id))
+            {
+                Songs.Add(song);
+            }
+        }
+        public List<Song> GetAllSongs() => Songs;
+
     }
 }

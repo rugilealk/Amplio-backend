@@ -1,18 +1,25 @@
 ﻿using System.Collections;
 namespace PSI.Models
 {
-    public class Playlist : IEnumerable<PlaylistSong>
+    public class Playlist : SongCollection, IEnumerable<PlaylistSong>
     {
-        public Guid PlaylistId { get; set; } = Guid.NewGuid();
         public Guid? CurrentSongId { get; set; }
-
         public Song? CurrentSong { get; set; } = null!;
-        public string Name { get; set; } = string.Empty;
         public List<PlaylistSong> Songs { get; set; } = new List<PlaylistSong>();
 
-        public Playlist(string name)
+        public bool IsPublic { get; set; } = false;
+        public int VisitCount { get; set; } = 0;
+        public Playlist() { }
+        public Playlist(string name, bool isPublic)
         {
-            this.Name = name;
+            Name = name;
+            IsPublic = isPublic;
+        }
+
+        public override void IncreasePopularity()
+        {
+            VisitCount++; // nebutina
+            Popularity = VisitCount;
         }
         public void AddSong(Song songToAdd)
         {
