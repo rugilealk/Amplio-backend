@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PSI.Data;
 using PSI.Models;
-using PSI.Extensions;
+using PSI.Extensions; // ?
 using PSI.Exceptions;
 
 namespace PSI.Services
@@ -19,12 +19,12 @@ namespace PSI.Services
             _votingService = votingService;
         }
 
-        public async Task<Playlist> CreatePlaylistAsync(string name, Guid? currentSongId = null)
+        public async Task<Playlist> CreatePlaylistAsync(string name, bool isPublic, Guid? currentSongId = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Playlist name cannot be empty", nameof(name));
 
-            var playlist = new Playlist(name)
+            var playlist = new Playlist(name, isPublic)
             {
                 CurrentSongId = currentSongId
             };
@@ -107,7 +107,7 @@ namespace PSI.Services
                 .Include(p => p.CurrentSong)
                 .Include(p => p.Songs)
                 .ThenInclude(ps => ps.Song)
-                .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
+                .FirstOrDefaultAsync(p => p.Id == playlistId);
 
             return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
