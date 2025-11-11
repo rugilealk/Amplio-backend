@@ -17,7 +17,7 @@ namespace PSI.Models
             Song = linkedSong;
             SongId = linkedSong.Id;
             Playlist = linkedPlaylist;
-            PlaylistId = linkedPlaylist.PlaylistId;
+            PlaylistId = linkedPlaylist.Id;
         }
 
         public void Upvote()
