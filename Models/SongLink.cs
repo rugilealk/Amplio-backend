@@ -12,7 +12,6 @@ namespace PSI.Models
             Value = NormalizeLink(value);
         }
 
-        // This method converts various YouTube links into a standard watch URL
         private static string NormalizeLink(string link)
         {
             if (string.IsNullOrWhiteSpace(link))

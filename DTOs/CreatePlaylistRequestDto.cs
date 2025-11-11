@@ -6,4 +6,3 @@
         Guid? CurrentSongId = null
     );
 }
-//CurrentSongId - optional argument 

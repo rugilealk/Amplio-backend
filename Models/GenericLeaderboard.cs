@@ -9,10 +9,18 @@
                 LeaderboardItems.Add(collection);
         }
 
-        public List<T> GetSortedByPopularity(int? numberOfSongs = null)
+        public void SortByPopularity()
         {
-            var sorted =  LeaderboardItems.OrderByDescending(c => c.Popularity).ThenBy(c => c.Name);
-            return numberOfSongs.HasValue ? sorted.Take(numberOfSongs.Value).ToList() : sorted.ToList();
+            LeaderboardItems = LeaderboardItems
+                .OrderByDescending(c => c.Popularity)
+                .ThenBy(c => c.Name)
+                .ToList();
+        }
+
+        public List<T> GetSortedByPopularity()
+        {
+            SortByPopularity();
+            return LeaderboardItems;
         }
 
         public void RemoveSongList(Guid id)

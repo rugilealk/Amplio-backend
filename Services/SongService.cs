@@ -45,10 +45,8 @@ namespace PSI.Services
                 {
                     string albumKey = $"{dto.Album.Name}|{dto.Album.Artist}";
 
-                    // Check in-memory dictionary first
                     if (!albums.TryGetValue(albumKey, out albumEntity))
                     {
-                        // Check database
                         albumEntity = await _databaseContext.Albums
                             .FirstOrDefaultAsync(a => a.Name == dto.Album.Name && a.Artist == dto.Album.Artist);
 
@@ -57,7 +55,6 @@ namespace PSI.Services
                             albumEntity = new Album(dto.Album.Name, dto.Album.Artist, dto.Album.ReleaseYear);
                             _databaseContext.Albums.Add(albumEntity);
                         }
-
                         albums[albumKey] = albumEntity;
                     }
                 }
@@ -71,14 +68,11 @@ namespace PSI.Services
                     Album = albumEntity,
                     AlbumId = albumEntity?.Id
                 };
-
                 songs.Add(song);
             }
 
-            // Save albums first
             await _databaseContext.SaveChangesAsync();
 
-            // Then save all songs at once
             _databaseContext.Songs.AddRange(songs);
             await _databaseContext.SaveChangesAsync();
 
@@ -103,11 +97,6 @@ namespace PSI.Services
             await _databaseContext.SaveChangesAsync();
         }
 
-
-
-
-
-
         private async Task<List<SongDto>?> LoadSongsFromFileAsync()
         {
             string filePath = Path.Combine(
@@ -123,22 +112,6 @@ namespace PSI.Services
 
             var songDtos = await JsonSerializer.DeserializeAsync<List<SongDto>>(fileStream, options);
             return songDtos;
-        }
-        private List<Song> MapDtosToEntities(List<SongDto> songDtos)
-        {
-            var songs = new List<Song>();
-            foreach (SongDto dto in songDtos)
-            {
-                var song = new Song
-                {
-                    Title = dto.Title,
-                    Artist = dto.Artist,
-                    Link = new SongLink(dto.Link),
-                    Genres = dto.Genres.ToList()
-                };
-                songs.Add(song);
-            }
-            return songs;
         }
     }
 }

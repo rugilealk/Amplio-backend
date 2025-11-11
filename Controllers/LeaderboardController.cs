@@ -3,7 +3,9 @@ using PSI.Services;
 
 namespace PSI.Controllers
 {
-    public class LeaderboardController : Controller
+    [Route("leaderboard")] 
+    [ApiController]
+    public class LeaderboardController : ControllerBase
     {
         private readonly LeaderboardService _leaderboardService;    
         public LeaderboardController(LeaderboardService leaderboardService)

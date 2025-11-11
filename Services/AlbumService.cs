@@ -23,7 +23,6 @@ namespace PSI.Services
         {
             return await _databaseContext.Albums
                 .Include(a => a.Songs)
-                .ThenInclude(s => s.Genres)
                 .FirstOrDefaultAsync(a => a.Id == albumId);
         }
         public async Task<Album> CreateAlbumAsync(string name, string artist, int releaseYear)
@@ -45,7 +44,6 @@ namespace PSI.Services
             return album;
         }
 
-        //padaryti private kazkaip??
         public async Task AddSongToAlbumAsync(Guid albumId, Guid songId)
         {
             var album = await GetAlbumByIdAsync(albumId)
