@@ -32,7 +32,6 @@ namespace PSI.Services
                     Id = p.Id,
                     Name = p.Name,
                     Popularity = p.Popularity,
-                    VisitCount = p.VisitCount,
                     IsPublic = p.IsPublic
                 })
                 .ToList();
