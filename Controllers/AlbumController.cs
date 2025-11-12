@@ -28,7 +28,7 @@ namespace PSI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAlbum([FromBody] CreateAlbumRequestDto request)
+        public async Task<IActionResult> CreateAlbum([FromBody] AlbumDto request)
         {
             if (string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Artist))
                 return BadRequest("Album name and artist cannot be empty.");

@@ -1,6 +1,8 @@
 using PSI.Services;
 using PSI.Data;
 using Microsoft.EntityFrameworkCore;
+using PSI.Repositories;
+using PSI.Repositories.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,8 +26,15 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
+// Repositories
+builder.Services.AddScoped<IPlaylistRepository, PlaylistRepository>();
+builder.Services.AddScoped<ISongRepository, SongRepository>();
+builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
+builder.Services.AddScoped<IPlaylistSongRepository, PlaylistSongRepository>();
+
+// Services
 builder.Services.AddScoped<SongService>();
-builder.Services.AddScoped<ConcurrentVotingService>(); // Register voting service
+builder.Services.AddScoped<ConcurrentVotingService>();
 builder.Services.AddScoped<PlaylistService>();
 builder.Services.AddScoped<AlbumService>();
 builder.Services.AddScoped<LeaderboardService>();

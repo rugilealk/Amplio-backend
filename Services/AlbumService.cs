@@ -1,29 +1,26 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PSI.Data;
-using PSI.Models;
+﻿using PSI.Models;
+using PSI.Repositories.Interfaces;
+
 namespace PSI.Services
 {
     public class AlbumService
     {
-        private readonly AppDbContext _databaseContext;
+        private readonly IAlbumRepository _albumRepository;
+        private readonly ISongRepository _songRepository;
 
-        public AlbumService(AppDbContext databaseContext)
+        public AlbumService(IAlbumRepository albumRepository, ISongRepository songRepository)
         {
-            _databaseContext = databaseContext;
+            _albumRepository = albumRepository;
+            _songRepository = songRepository;
         }
         public async Task<List<Album>> GetAllAlbumsAsync()
         {
-            return await _databaseContext.Albums
-                .Include(a => a.Songs)
-                .OrderBy(a => a.Name)
-                .ToListAsync();
+            return await _albumRepository.GetAllWithSongsAsync();
         }
 
         public async Task<Album?> GetAlbumByIdAsync(Guid albumId)
         {
-            return await _databaseContext.Albums
-                .Include(a => a.Songs)
-                .FirstOrDefaultAsync(a => a.Id == albumId);
+            return await _albumRepository.GetByIdAsync(albumId);
         }
         public async Task<Album> CreateAlbumAsync(string name, string artist, int releaseYear)
         {
@@ -38,9 +35,7 @@ namespace PSI.Services
 
             var album = new Album(name, artist, releaseYear);
 
-            _databaseContext.Albums.Add(album);
-            await _databaseContext.SaveChangesAsync();
-
+            await _albumRepository.AddAsync(album);
             return album;
         }
 
@@ -49,14 +44,14 @@ namespace PSI.Services
             var album = await GetAlbumByIdAsync(albumId)
                 ?? throw new KeyNotFoundException("Album not found");
 
-            var song = await _databaseContext.Songs.FindAsync(songId)
+            var song = await _songRepository.GetByIdAsync(songId)
                 ?? throw new KeyNotFoundException("Song not found");
 
             album.AddSong(song);
             song.AlbumId = albumId;
             song.Album = album;
 
-            await _databaseContext.SaveChangesAsync();
+            await _albumRepository.UpdateAsync(album);
         }
 
         public async Task IncreaseAlbumPopularityAsync(Guid albumId)
@@ -65,7 +60,7 @@ namespace PSI.Services
             if (album != null)
             {
                 album.IncreasePopularity();
-                await _databaseContext.SaveChangesAsync();
+                await _albumRepository.UpdateAsync(album);
             }
         }
     }
