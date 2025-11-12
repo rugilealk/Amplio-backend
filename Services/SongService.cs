@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PSI.Data;
-using PSI.DTOs;
+﻿using PSI.DTOs;
 using PSI.Models;
+using PSI.Repositories;
+using PSI.Repositories.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -9,21 +9,31 @@ namespace PSI.Services
 {
     public class SongService
     {
-        private readonly AppDbContext _databaseContext;
+        private readonly ISongRepository _songRepository;
+        private readonly IAlbumRepository _albumRepository;
+        private readonly IPlaylistRepository _playlistRepository;
+        private readonly IPlaylistSongRepository _playlistSongRepository;
 
-        public SongService(AppDbContext databaseContext)
+        public SongService(
+            ISongRepository songRepository,
+            IAlbumRepository albumRepository,
+            IPlaylistRepository playlistRepository,
+            IPlaylistSongRepository playlistSongRepository)
         {
-            _databaseContext = databaseContext;
+            _songRepository = songRepository;
+            _albumRepository = albumRepository;
+            _playlistRepository = playlistRepository;
+            _playlistSongRepository = playlistSongRepository;
         }
 
         public async Task<IEnumerable<Song>> GetAllSongsAsync()
         {
-            return await _databaseContext.Songs.ToListAsync();
+            return await _songRepository.GetAllAsync();
         }
 
         public async Task<Song?> GetSongByIdAsync(Guid songId)
         {
-            return await _databaseContext.Songs.FindAsync(songId);
+            return await _songRepository.GetByIdAsync(songId);
         }
 
         public async Task<List<Song>> ImportSongsFromFileAsync()
@@ -47,13 +57,12 @@ namespace PSI.Services
 
                     if (!albums.TryGetValue(albumKey, out albumEntity))
                     {
-                        albumEntity = await _databaseContext.Albums
-                            .FirstOrDefaultAsync(a => a.Name == dto.Album.Name && a.Artist == dto.Album.Artist);
+                        albumEntity = await _albumRepository.GetByNameAndArtistAsync(dto.Album.Name, dto.Album.Artist);
 
                         if (albumEntity == null)
                         {
                             albumEntity = new Album(dto.Album.Name, dto.Album.Artist, dto.Album.ReleaseYear);
-                            _databaseContext.Albums.Add(albumEntity);
+                            await _albumRepository.AddAsync(albumEntity);
                         }
                         albums[albumKey] = albumEntity;
                     }
@@ -71,30 +80,16 @@ namespace PSI.Services
                 songs.Add(song);
             }
 
-            await _databaseContext.SaveChangesAsync();
-
-            _databaseContext.Songs.AddRange(songs);
-            await _databaseContext.SaveChangesAsync();
-
+            await _songRepository.AddRangeAsync(songs);
             return songs;
         }
 
         private async Task ClearExistingDataAsync()
         {
-            var playlists = await _databaseContext.Playlists.ToListAsync();
-            playlists.ForEach(p => p.CurrentSongId = null);
-            await _databaseContext.SaveChangesAsync();
-
-            var playlistSongs = await _databaseContext.PlaylistSongs.ToListAsync();
-            _databaseContext.PlaylistSongs.RemoveRange(playlistSongs);
-
-            var songs = await _databaseContext.Songs.ToListAsync();
-            _databaseContext.Songs.RemoveRange(songs);
-
-            var albums = await _databaseContext.Albums.ToListAsync();
-            _databaseContext.Albums.RemoveRange(albums);
-
-            await _databaseContext.SaveChangesAsync();
+            await _playlistRepository.ClearCurrentSongForAllAsync();
+            await _playlistSongRepository.RemoveAllAsync();
+            await _songRepository.RemoveAllAsync();
+            await _albumRepository.RemoveAllAsync();
         }
 
         private async Task<List<SongDto>?> LoadSongsFromFileAsync()

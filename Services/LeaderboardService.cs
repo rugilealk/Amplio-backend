@@ -1,26 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PSI.Data;
-using PSI.DTOs;
+﻿using PSI.DTOs;
 using PSI.Models;
+using PSI.Repositories.Interfaces;
 
 namespace PSI.Services
 {
     public class LeaderboardService
     {
-        private readonly AppDbContext _databaseContext;
+        private readonly IPlaylistRepository _playlistRepository;
+        private readonly IAlbumRepository _albumRepository;
 
-        public LeaderboardService(AppDbContext databaseContext)
+        public LeaderboardService(IPlaylistRepository playlistRepository, IAlbumRepository albumRepository)
         {
-            _databaseContext = databaseContext;
+            _playlistRepository = playlistRepository;
+            _albumRepository = albumRepository;
         }
         public async Task<LeaderboardResponseDto<PlaylistLeaderboardDto>> GetPlaylistLeaderboardAsync(int topN = 10)
         {
             var leaderboard = new GenericLeaderboard<Playlist>();
 
-            var playlists = await _databaseContext.Playlists
-                .AsNoTracking()
-                .Where(p => p.IsPublic)
-                .ToListAsync();
+            var playlists = await _playlistRepository.GetPublicPlaylistsAsync();
 
             foreach (var playlist in playlists)
             {
@@ -49,9 +47,7 @@ namespace PSI.Services
         {
             var leaderboard = new GenericLeaderboard<Album>();
 
-            var albums = await _databaseContext.Albums
-                .AsNoTracking()
-                .ToListAsync();
+            var albums = await _albumRepository.GetAllAsync();
 
             foreach (var album in albums)
             {

@@ -1,36 +1,41 @@
-using Microsoft.EntityFrameworkCore;
-using PSI.Data;
 using PSI.Models;
-using PSI.Extensions; // ?
 using PSI.Exceptions;
+using PSI.Repositories.Interfaces;
 
 namespace PSI.Services
 {
     public class PlaylistService
     {
-        private readonly AppDbContext _databaseContext;
-        private readonly SongService _songService;
+        private readonly IPlaylistRepository _playlistRepository;
+        private readonly ISongRepository _songRepository;
+        private readonly IAlbumRepository _albumRepository;
         private readonly ConcurrentVotingService _votingService;
 
-        public PlaylistService(AppDbContext databaseContext, SongService songService, ConcurrentVotingService votingService)
+        public PlaylistService(
+            IPlaylistRepository playlistRepository,
+            ISongRepository songRepository,
+            IAlbumRepository albumRepository,
+            ConcurrentVotingService votingService)
         {
-            _databaseContext = databaseContext;
-            _songService = songService;
+            _playlistRepository = playlistRepository;
+            _songRepository = songRepository;
+            _albumRepository = albumRepository;
             _votingService = votingService;
         }
 
         public async Task<Playlist> CreatePlaylistAsync(string name, bool isPublic, Guid? currentSongId = null)
         {
             if (string.IsNullOrWhiteSpace(name))
+            {
                 throw new ArgumentException("Playlist name cannot be empty", nameof(name));
+            }
 
             var playlist = new Playlist(name, isPublic)
             {
                 CurrentSongId = currentSongId
             };
 
-            _databaseContext.Playlists.Add(playlist);
-            await _databaseContext.SaveChangesAsync();
+            await _playlistRepository.AddAsync(playlist);
             return playlist;
         }
 
@@ -43,20 +48,21 @@ namespace PSI.Services
         public async Task<List<PlaylistSong>> AddSongToPlaylistAsync(Guid playlistId, Guid songId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
-            var song = await _songService.GetSongByIdAsync(songId)
+            var song = await _songRepository.GetByIdAsync(songId)
                 ?? throw new KeyNotFoundException("Song not found");
 
             playlist.AddSong(song);
             if (song.AlbumId.HasValue)
             {
-                var album = await _databaseContext.Albums.FindAsync(song.AlbumId.Value);
+                var album = await _albumRepository.GetByIdAsync(song.AlbumId.Value);
                 if (album != null)
                 {
                     album.IncreasePopularity();
+                    await _albumRepository.UpdateAsync(album);
                 }
             }
 
-            await _databaseContext.SaveChangesAsync();
+            await _playlistRepository.UpdateAsync(playlist);
             return playlist.GetAllSongs();
         }
 
@@ -69,18 +75,19 @@ namespace PSI.Services
                 throw new KeyNotFoundException("Song not found in playlist");
             }
 
-            await _databaseContext.SaveChangesAsync();
+            await _playlistRepository.UpdateAsync(playlist);
         }
 
         public async Task IncreasePlaylistPopularityAsync(Guid playlistId)
         {
             var playlist = await GetPlaylistByIdAsync(playlistId);
             if (playlist == null)
+            {
                 throw new KeyNotFoundException("Playlist not found");
-            
-            playlist.IncreasePopularity();
-            await _databaseContext.SaveChangesAsync();
+            }
 
+            playlist.IncreasePopularity();
+            await _playlistRepository.UpdateAsync(playlist);
         }
 
         public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
@@ -93,7 +100,7 @@ namespace PSI.Services
 
             _votingService.Upvote(playlistSong);
 
-            await _databaseContext.SaveChangesAsync();
+            await _playlistRepository.UpdateAsync(playlist);
             return playlist.GetAllSongs();
         }
 
@@ -104,15 +111,17 @@ namespace PSI.Services
 
             // Custom exception used here
             if (!playlistSongs.Any())
+            {
                 throw new PlaylistOperationException("Cannot set current song because the playlist is empty.");
+            }
 
             var topSong = playlistSongs.First().Song;
             playlist.CurrentSong = topSong;
 
             playlist.DeleteSong(topSong.Id);
 
-            await _databaseContext.SaveChangesAsync();
-            return playlist.CurrentSong;
+            await _playlistRepository.UpdateAsync(playlist);
+            return playlist.CurrentSong!;
         }
 
         public async Task<Song?> GetCurrentSongAsync(Guid playlistId)
@@ -123,12 +132,7 @@ namespace PSI.Services
 
         private async Task<Playlist> GetPlaylistByIdAsync(Guid playlistId)
         {
-            var playlist = await _databaseContext.Playlists
-                .Include(p => p.CurrentSong)
-                .Include(p => p.Songs)
-                .ThenInclude(ps => ps.Song)
-                .FirstOrDefaultAsync(p => p.Id == playlistId);
-
+            var playlist = await _playlistRepository.GetDetailedByIdAsync(playlistId);
             return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
 
