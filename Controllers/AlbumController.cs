@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PSI.DTOs;
-using PSI.Services;
+using PSI.Services.Interfaces;
 
 namespace PSI.Controllers
 {
@@ -8,11 +8,13 @@ namespace PSI.Controllers
     [ApiController]
     public class AlbumController : ControllerBase
     {
-        private readonly AlbumService _albumService;
-        public AlbumController(AlbumService albumService)
+        private readonly IAlbumService _albumService;
+        
+        public AlbumController(IAlbumService albumService)
         {
             _albumService = albumService;
         }
+        
         [HttpGet]
         public async Task<IActionResult> GetAllAlbums()
         {

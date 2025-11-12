@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using PSI.Models;
+using PSI.Services.Interfaces;
 
 namespace PSI.Services
 {
-    public class ConcurrentVotingService
+    public class ConcurrentVotingService : IConcurrentVotingService
     {
         private readonly ConcurrentDictionary<Guid, int> _votes = new();
 

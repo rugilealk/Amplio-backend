@@ -2,12 +2,13 @@
 using PSI.Models;
 using PSI.Repositories;
 using PSI.Repositories.Interfaces;
+using PSI.Services.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace PSI.Services
 {
-    public class SongService
+    public class SongService : ISongService
     {
         private readonly ISongRepository _songRepository;
         private readonly IAlbumRepository _albumRepository;

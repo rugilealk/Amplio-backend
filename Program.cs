@@ -1,4 +1,5 @@
 using PSI.Services;
+using PSI.Services.Interfaces;
 using PSI.Data;
 using Microsoft.EntityFrameworkCore;
 using PSI.Repositories;
@@ -33,11 +34,11 @@ builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
 builder.Services.AddScoped<IPlaylistSongRepository, PlaylistSongRepository>();
 
 // Services
-builder.Services.AddScoped<SongService>();
-builder.Services.AddScoped<ConcurrentVotingService>();
-builder.Services.AddScoped<PlaylistService>();
-builder.Services.AddScoped<AlbumService>();
-builder.Services.AddScoped<LeaderboardService>();
+builder.Services.AddScoped<ISongService, SongService>();
+builder.Services.AddScoped<IConcurrentVotingService, ConcurrentVotingService>();
+builder.Services.AddScoped<IPlaylistService, PlaylistService>();
+builder.Services.AddScoped<IAlbumService, AlbumService>();
+builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 
 builder.Services.AddHttpClient();
 

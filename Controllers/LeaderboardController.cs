@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PSI.Services;
+using PSI.Services.Interfaces;
 
 namespace PSI.Controllers
 {
@@ -7,8 +7,9 @@ namespace PSI.Controllers
     [ApiController]
     public class LeaderboardController : ControllerBase
     {
-        private readonly LeaderboardService _leaderboardService;    
-        public LeaderboardController(LeaderboardService leaderboardService)
+        private readonly ILeaderboardService _leaderboardService;
+        
+        public LeaderboardController(ILeaderboardService leaderboardService)
         {
             _leaderboardService = leaderboardService;
         }
