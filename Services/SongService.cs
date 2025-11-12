@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using PSI.Data;
 using PSI.DTOs;
 using PSI.Models;
@@ -31,16 +31,51 @@ namespace PSI.Services
             await ClearExistingDataAsync();
 
             List<SongDto>? songDtos = await LoadSongsFromFileAsync();
-
             if (songDtos == null)
+                throw new InvalidOperationException("Failed to deserialize songs from file");
+
+            var songs = new List<Song>();
+            var albums = new Dictionary<string, Album>(); // Track albums by key
+
+            foreach (var dto in songDtos)
             {
-                throw new InvalidOperationException($"Failed to deserialize songs from file:");
+                Album? albumEntity = null;
+
+                if (dto.Album != null)
+                {
+                    string albumKey = $"{dto.Album.Name}|{dto.Album.Artist}";
+
+                    if (!albums.TryGetValue(albumKey, out albumEntity))
+                    {
+                        albumEntity = await _databaseContext.Albums
+                            .FirstOrDefaultAsync(a => a.Name == dto.Album.Name && a.Artist == dto.Album.Artist);
+
+                        if (albumEntity == null)
+                        {
+                            albumEntity = new Album(dto.Album.Name, dto.Album.Artist, dto.Album.ReleaseYear);
+                            _databaseContext.Albums.Add(albumEntity);
+                        }
+                        albums[albumKey] = albumEntity;
+                    }
+                }
+
+                var song = new Song
+                {
+                    Title = dto.Title,
+                    Artist = dto.Artist,
+                    Link = new SongLink(dto.Link),
+                    Genres = dto.Genres.ToList(),
+                    Album = albumEntity,
+                    AlbumId = albumEntity?.Id
+                };
+                songs.Add(song);
             }
 
-            List<Song> songs = MapDtosToEntities(songDtos);
-            _databaseContext.Songs.AddRange(songs);
-
             await _databaseContext.SaveChangesAsync();
+
+            _databaseContext.Songs.AddRange(songs);
+            await _databaseContext.SaveChangesAsync();
+
             return songs;
         }
 
@@ -48,12 +83,18 @@ namespace PSI.Services
         {
             var playlists = await _databaseContext.Playlists.ToListAsync();
             playlists.ForEach(p => p.CurrentSongId = null);
+            await _databaseContext.SaveChangesAsync();
 
-            var playlistSongs = _databaseContext.PlaylistSongs.ToList();
+            var playlistSongs = await _databaseContext.PlaylistSongs.ToListAsync();
             _databaseContext.PlaylistSongs.RemoveRange(playlistSongs);
 
-            var existingSongs = _databaseContext.Songs.ToList();
-            _databaseContext.Songs.RemoveRange(existingSongs);
+            var songs = await _databaseContext.Songs.ToListAsync();
+            _databaseContext.Songs.RemoveRange(songs);
+
+            var albums = await _databaseContext.Albums.ToListAsync();
+            _databaseContext.Albums.RemoveRange(albums);
+
+            await _databaseContext.SaveChangesAsync();
         }
 
         private async Task<List<SongDto>?> LoadSongsFromFileAsync()
@@ -71,22 +112,6 @@ namespace PSI.Services
 
             var songDtos = await JsonSerializer.DeserializeAsync<List<SongDto>>(fileStream, options);
             return songDtos;
-        }
-        private List<Song> MapDtosToEntities(List<SongDto> songDtos)
-        {
-            var songs = new List<Song>();
-            foreach (SongDto dto in songDtos)
-            {
-                var song = new Song
-                {
-                    Title = dto.Title,
-                    Artist = dto.Artist,
-                    Link = new SongLink(dto.Link),
-                    Genres = dto.Genres.ToList()
-                };
-                songs.Add(song);
-            }
-            return songs;
         }
     }
 }

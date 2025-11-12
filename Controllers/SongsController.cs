@@ -51,18 +51,23 @@ namespace PSI.Controllers
             }
             catch (FileNotFoundException ex)
             {
+                Console.WriteLine($"File not found: {ex.Message}");
                 return NotFound(new { error = "Songs file not found", details = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
+                Console.WriteLine($"Invalid operation: {ex.Message}"); 
                 return BadRequest(new { error = "Failed to import songs", details = ex.Message });
             }
             catch (JsonException ex)
             {
+                Console.WriteLine($"JSON error: {ex.Message}"); 
                 return BadRequest(new { error = "Invalid JSON format in songs file", details = ex.Message });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"UNEXPECTED ERROR: {ex.Message}"); 
+                Console.WriteLine($"Stack trace: {ex.StackTrace}"); 
                 return StatusCode(500, new { error = "An unexpected error occurred", details = ex.Message });
             }
         }

@@ -1,146 +1,108 @@
 [
-    {
-        "Title": "Blinding Lights",
-        "Artist": "The Weeknd",
-        "Genres": [ "Pop" ],
-        "Link": "https://www.youtube.com/watch?v=fHI8X4OXluQ"
-    },
-    {
-        "Title": "In Your Eyes",
-        "Artist": "The Weeknd",
-        "Genres": [ "Pop" ],
-        "Link": "https://youtu.be/E3QiD99jPAg?si=ur0xogPzXCuBGIFY"
-    },
-    {
-        "Title": "Moth To A Flame",
-        "Artist": "The Weeknd",
-        "Genres": [ "Pop" ],
-        "Link": "https://youtu.be/u9n7Cw-4_HQ?si=mStm0bNnGle2gi4l"
-    },
-    {
-        "Title": "Starboy",
-        "Artist": "The Weeknd",
-        "Genres": [ "Pop" ],
-        "Link": "https://youtu.be/Rif-RTvmmss?si=r49Vp4PzoURl6drh"
-    },
-    {
-        "Title": "I Feel It Coming",
-        "Artist": "The Weeknd ft. Daft Punk",
-        "Genres": [ "Pop" ],
-        "Link": "https://youtu.be/5v1TOFULOWA?si=gcsmA04ROvl4G9LK"
-    },
-    {
-        "Title": "Young and Beautiful",
-        "Artist": "Lana Del Rey",
-        "Genres": [ "Pop" ],
-        "Link": "https://www.youtube.com/watch?v=o_1aF54DO60"
-    },
-    {
-        "Title": "Born to Die",
-        "Artist": "Lana Del Rey",
-        "Genres": [ "Pop", "Indie" ],
-        "Link": "https://www.youtube.com/watch?v=Bag1gUxuU0g"
-    },
-    {
-        "Title": "Blue Jeans",
-        "Artist": "Lana Del Rey",
-        "Genres": [ "Pop", "Indie" ],
-        "Link": "https://youtu.be/9p15MdpVAO0?si=LzD7GnaGFlShzRDE"
-    },
-    {
-        "Title": "West Coast",
-        "Artist": "Lana Del Rey",
-        "Genres": [ "Pop", "Indie" ],
-        "Link": "https://www.youtube.com/watch?v=sZt8xSka6pY"
-    },
-    {
-        "Title": "The Less I Know The Better",
-        "Artist": "Tame Impala",
-        "Genres": [ "Indie" ],
-        "Link": "https://youtu.be/2SUwOgmvzK4?si=NaCNDnMG6urA3o9O"
-    },
-    {
-        "Title": "Let It Happen",
-        "Artist": "Tame Impala",
-        "Genres": [ "Indie" ],
-        "Link": "https://youtu.be/odeHP8N4LKc?si=BkAjlTxYejstqQaK"
-    },
-    {
-        "Title": "Nangs",
-        "Artist": "Tame Impala",
-        "Genres": [ "Indie" ],
-        "Link": "https://youtu.be/c3yEjD_oijw?si=LZ8TFD1YfT7DgVHE"
-    },
-    {
-        "Title": "Borderline",
-        "Artist": "Tame Impala",
-        "Genres": [ "Indie" ],
-        "Link": "https://youtu.be/2g5xkLqIElU?si=MraVovH2iLeblp8Q"
-    },
-    {
-        "Title": "Elephant",
-        "Artist": "Tame Impala",
-        "Genres": [ "Rock" ],
-        "Link": "https://youtu.be/z7q9W2PNhJ4?si=ymiAgf3ylVI_I406"
-    },
-    {
-        "Title": "Feels Like We Only Go Backwards",
-        "Artist": "Tame Impala",
-        "Genres": [ "Indie" ],
-        "Link": "https://youtu.be/TZ-W40TEXNc?si=ySKi0Ho7xIW49549"
-    },
-    {
-        "Title": "David",
-        "Artist": "Lorde",
-        "Genres": [ "Pop" ],
-        "Link": "https://youtu.be/xFo_39Wgv5I?si=xSPIa8Ge-1KxVEoU"
-    },
-    {
-        "Title": "Ribs",
-        "Artist": "Lorde",
-        "Genres": [ "Pop" ],
-        "Link": "https://youtu.be/b7pE8AG1jjE?si=n7E6F1ZWxS4jrc7k"
-    },
-    {
-        "Title": "Team",
-        "Artist": "Lorde",
-        "Genres": [ "Pop", "Alternative" ],
-        "Link": "https://youtu.be/EVEVWlhiClo?si=qm0m4U-dPWXOdKZV"
-    },
-    {
-        "Title": "Hammer",
-        "Artist": "Lorde",
-        "Genres": [ "Pop", "Alternative" ],
-        "Link": "https://youtu.be/eUTUXAeSpqE?si=-NV2nJK2VKDa3kMo"
-    },
-    {
-        "Title": "Shapeshifter",
-        "Artist": "Lorde",
-        "Genres": [ "Pop", "Alternative" ],
-        "Link": "https://youtu.be/0-W6AQ0J1Zc?si=dN8hhICZ0xyvKNf7"
-    },
-    {
-        "Title": "Man Of The Year",
-        "Artist": "Lorde",
-        "Genres": [ "Pop", "Alternative" ],
-        "Link": "https://youtu.be/HIcjeZtpJs4?si=bnjMuVtgFrBtBqCe"
-    },
-    {
-        "Title": "Current Affairs",
-        "Artist": "Lorde",
-        "Genres": [ "Pop", "Alternative" ],
-        "Link": "https://youtu.be/Ir2M9fVYnwY?si=HKa2JCiedz0xxsxW"
-    },
-    {
-        "Title": "Buzzcut Season",
-        "Artist": "Lorde",
-        "Genres": [ "Pop", "Alternative" ],
-        "Link": "https://youtu.be/z3gq8u9OuM8?si=KVSUs5VLvPmqKgyP"
-    },
-    {
-        "Title": "Liability",
-        "Artist": "Lorde",
-        "Genres": [ "Pop" ],
-        "Link": "https://youtu.be/BtvJaNeELic?si=mbw8dg7RYr0p8tiO"
+  {
+    "Title": "Blinding Lights",
+    "Artist": "The Weeknd",
+    "Genres": [ "Pop" ],
+    "Link": "https://www.youtube.com/watch?v=fHI8X4OXluQ",
+    "Album": {
+      "Name": "After Hours",
+      "Artist": "The Weeknd",
+      "ReleaseYear": 2020
     }
+  },
+  {
+    "Title": "In Your Eyes",
+    "Artist": "The Weeknd",
+    "Genres": [ "Pop" ],
+    "Link": "https://youtu.be/E3QiD99jPAg?si=ur0xogPzXCuBGIFY",
+    "Album": {
+      "Name": "After Hours",
+      "Artist": "The Weeknd",
+      "ReleaseYear": 2020
+    }
+  },
+  {
+    "Title": "Starboy",
+    "Artist": "The Weeknd",
+    "Genres": [ "Pop" ],
+    "Link": "https://youtu.be/Rif-RTvmmss?si=r49Vp4PzoURl6drh",
+    "Album": {
+      "Name": "Starboy",
+      "Artist": "The Weeknd",
+      "ReleaseYear": 2016
+    }
+  },
+  {
+    "Title": "Born to Die",
+    "Artist": "Lana Del Rey",
+    "Genres": [ "Pop", "Indie" ],
+    "Link": "https://www.youtube.com/watch?v=Bag1gUxuU0g",
+    "Album": {
+      "Name": "Born to Die",
+      "Artist": "Lana Del Rey",
+      "ReleaseYear": 2012
+    }
+  },
+  {
+    "Title": "Young and Beautiful",
+    "Artist": "Lana Del Rey",
+    "Genres": [ "Pop" ],
+    "Link": "https://www.youtube.com/watch?v=o_1aF54DO60",
+    "Album": {
+      "Name": "Born to Die",
+      "Artist": "Lana Del Rey",
+      "ReleaseYear": 2012
+    }
+  },
+  {
+    "Title": "Elephant",
+    "Artist": "Tame Impala",
+    "Genres": [ "Rock" ],
+    "Link": "https://youtu.be/z7q9W2PNhJ4?si=ymiAgf3ylVI_I406",
+    "Album": {
+      "Name": "Lonerism",
+      "Artist": "Tame Impala",
+      "ReleaseYear": 2012
+    }
+  },
+  {
+    "Title": "Let It Happen",
+    "Artist": "Tame Impala",
+    "Genres": [ "Indie" ],
+    "Link": "https://youtu.be/odeHP8N4LKc?si=BkAjlTxYejstqQaK",
+    "Album": {
+      "Name": "Currents",
+      "Artist": "Tame Impala",
+      "ReleaseYear": 2015
+    }
+  },
+  {
+    "Title": "Team",
+    "Artist": "Lorde",
+    "Genres": [ "Pop", "Alternative" ],
+    "Link": "https://youtu.be/EVEVWlhiClo?si=qm0m4U-dPWXOdKZV",
+    "Album": {
+      "Name": "Pure Heroine",
+      "Artist": "Lorde",
+      "ReleaseYear": 2013
+    }
+  },
+  {
+    "Title": "Shapeshifter",
+    "Artist": "Lorde",
+    "Genres": [ "Pop", "Alternative" ],
+    "Link": "https://youtu.be/0-W6AQ0J1Zc?si=dN8hhICZ0xyvKNf7",
+    "Album": {
+      "Name": "Melodrama",
+      "Artist": "Lorde",
+      "ReleaseYear": 2017
+    }
+  },
+  {
+    "Title": "Ribs",
+    "Artist": "Lorde",
+    "Genres": [ "Pop" ],
+    "Link": "https://youtu.be/b7pE8AG1jjE?si=n7E6F1ZWxS4jrc7k",
+    "Album": null
+  }
 ]

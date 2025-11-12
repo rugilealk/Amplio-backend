@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using PSI.Data;
 using PSI.Models;
-using PSI.Extensions;
+using PSI.Extensions; // ?
 using PSI.Exceptions;
 
 namespace PSI.Services
@@ -19,12 +19,12 @@ namespace PSI.Services
             _votingService = votingService;
         }
 
-        public async Task<Playlist> CreatePlaylistAsync(string name, Guid? currentSongId = null)
+        public async Task<Playlist> CreatePlaylistAsync(string name, bool isPublic, Guid? currentSongId = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Playlist name cannot be empty", nameof(name));
 
-            var playlist = new Playlist(name)
+            var playlist = new Playlist(name, isPublic)
             {
                 CurrentSongId = currentSongId
             };
@@ -47,6 +47,15 @@ namespace PSI.Services
                 ?? throw new KeyNotFoundException("Song not found");
 
             playlist.AddSong(song);
+            if (song.AlbumId.HasValue)
+            {
+                var album = await _databaseContext.Albums.FindAsync(song.AlbumId.Value);
+                if (album != null)
+                {
+                    album.IncreasePopularity();
+                }
+            }
+
             await _databaseContext.SaveChangesAsync();
             return playlist.GetAllSongs();
         }
@@ -61,6 +70,17 @@ namespace PSI.Services
             }
 
             await _databaseContext.SaveChangesAsync();
+        }
+
+        public async Task IncreasePlaylistPopularityAsync(Guid playlistId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+            if (playlist == null)
+                throw new KeyNotFoundException("Playlist not found");
+            
+            playlist.IncreasePopularity();
+            await _databaseContext.SaveChangesAsync();
+
         }
 
         public async Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId)
@@ -107,9 +127,10 @@ namespace PSI.Services
                 .Include(p => p.CurrentSong)
                 .Include(p => p.Songs)
                 .ThenInclude(ps => ps.Song)
-                .FirstOrDefaultAsync(p => p.PlaylistId == playlistId);
+                .FirstOrDefaultAsync(p => p.Id == playlistId);
 
             return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
+
     }
 }

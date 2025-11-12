@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PSI.Data;
@@ -11,9 +12,11 @@ using PSI.Data;
 namespace PSI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251111184004_AddSongCollectionLeaderboardLogic")]
+    partial class AddSongCollectionLeaderboardLogic
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,60 +24,6 @@ namespace PSI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("PSI.Models.Album", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Artist")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Popularity")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ReleaseYear")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Albums");
-                });
-
-            modelBuilder.Entity("PSI.Models.Playlist", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("CurrentSongId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsPublic")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Popularity")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("VisitCount")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CurrentSongId");
-
-                    b.ToTable("Playlists");
-                });
 
             modelBuilder.Entity("PSI.Models.PlaylistSong", b =>
                 {
@@ -128,13 +77,63 @@ namespace PSI.Migrations
                     b.ToTable("Songs");
                 });
 
+            modelBuilder.Entity("PSI.Models.SongCollection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Popularity")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SongListType")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("character varying(21)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SongCollection");
+
+                    b.HasDiscriminator<string>("SongListType").HasValue("SongCollection");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("PSI.Models.Album", b =>
+                {
+                    b.HasBaseType("PSI.Models.SongCollection");
+
+                    b.Property<string>("Artist")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("ReleaseYear")
+                        .HasColumnType("integer");
+
+                    b.HasDiscriminator().HasValue("Album");
+                });
+
             modelBuilder.Entity("PSI.Models.Playlist", b =>
                 {
-                    b.HasOne("PSI.Models.Song", "CurrentSong")
-                        .WithMany()
-                        .HasForeignKey("CurrentSongId");
+                    b.HasBaseType("PSI.Models.SongCollection");
 
-                    b.Navigation("CurrentSong");
+                    b.Property<Guid?>("CurrentSongId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("VisitCount")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("CurrentSongId");
+
+                    b.HasDiscriminator().HasValue("Playlist");
                 });
 
             modelBuilder.Entity("PSI.Models.PlaylistSong", b =>
@@ -163,6 +162,15 @@ namespace PSI.Migrations
                         .HasForeignKey("AlbumId");
 
                     b.Navigation("Album");
+                });
+
+            modelBuilder.Entity("PSI.Models.Playlist", b =>
+                {
+                    b.HasOne("PSI.Models.Song", "CurrentSong")
+                        .WithMany()
+                        .HasForeignKey("CurrentSongId");
+
+                    b.Navigation("CurrentSong");
                 });
 
             modelBuilder.Entity("PSI.Models.Album", b =>

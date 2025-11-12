@@ -27,6 +27,8 @@ builder.Services.AddControllers()
 builder.Services.AddScoped<SongService>();
 builder.Services.AddScoped<ConcurrentVotingService>(); // Register voting service
 builder.Services.AddScoped<PlaylistService>();
+builder.Services.AddScoped<AlbumService>();
+builder.Services.AddScoped<LeaderboardService>();
 
 builder.Services.AddHttpClient();
 

@@ -8,5 +8,7 @@ namespace PSI.DTOs
         public string Artist { get; set; } = string.Empty;
         public List<Genre> Genres { get; set; } = new List<Genre>();
         public string Link { get; set; } = string.Empty;
+
+        public AlbumDto? Album { get; set; } = null;
     }
 }

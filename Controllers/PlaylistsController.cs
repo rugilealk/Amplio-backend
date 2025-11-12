@@ -23,8 +23,8 @@ namespace PSI.Controllers
             if (string.IsNullOrWhiteSpace(request.Name))
                 return BadRequest("Playlist name cannot be empty.");
 
-            var playlist = await _playlistService.CreatePlaylistAsync(request.Name, request.CurrentSongId);
-            return Created($"/playlist/{playlist.PlaylistId}", new { playlist.PlaylistId, playlist.Name, playlist.CurrentSongId });
+            var playlist = await _playlistService.CreatePlaylistAsync(request.Name, request.IsPublic, request.CurrentSongId);
+            return Created($"/playlist/{playlist.Id}", new { playlist.Id, playlist.Name, playlist.IsPublic, playlist.CurrentSongId });
         }
 
         [HttpGet("{playlistId:guid}")]
@@ -111,5 +111,19 @@ namespace PSI.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [HttpPost("{playlistId:guid}/visit")]
+        public async Task<IActionResult> RegisterVisit(Guid playlistId)
+        {
+            try
+            {
+                await _playlistService.IncreasePlaylistPopularityAsync(playlistId);
+                return Ok(new { message = "Playlist visit registered." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
     }
 }
