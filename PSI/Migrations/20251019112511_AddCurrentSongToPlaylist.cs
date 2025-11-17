@@ -1,11 +1,12 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System.Diagnostics.CodeAnalysis;
 
 #nullable disable
 
 namespace PSI.Migrations
 {
     /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     public partial class AddCurrentSongToPlaylist : Migration
     {
         /// <inheritdoc />
