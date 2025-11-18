@@ -16,7 +16,7 @@ namespace PSI.Repositories
 
         public async Task<List<Album>> GetAllAsync() => await _context.Albums.AsNoTracking().ToListAsync();
 
-        public async Task<Album?> GetByIdAsync(Guid id) => await _context.Albums.FindAsync(id);
+        public async Task<Album?> GetByIdAsync(Guid id) => await _context.Albums.Include(a => a.Songs).FirstOrDefaultAsync(a => a.Id == id);
 
         public async Task<Album?> GetByNameAndArtistAsync(string name, string artist)
         {
