@@ -1,21 +1,22 @@
 using PSI.Models;
 using PSI.Exceptions;
 using PSI.Repositories.Interfaces;
+using PSI.Services.Interfaces;
 
 namespace PSI.Services
 {
-    public class PlaylistService
+    public class PlaylistService : IPlaylistService
     {
         private readonly IPlaylistRepository _playlistRepository;
         private readonly ISongRepository _songRepository;
         private readonly IAlbumRepository _albumRepository;
-        private readonly ConcurrentVotingService _votingService;
+        private readonly IConcurrentVotingService _votingService;
 
         public PlaylistService(
             IPlaylistRepository playlistRepository,
             ISongRepository songRepository,
             IAlbumRepository albumRepository,
-            ConcurrentVotingService votingService)
+            IConcurrentVotingService votingService)
         {
             _playlistRepository = playlistRepository;
             _songRepository = songRepository;

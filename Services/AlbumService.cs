@@ -1,9 +1,10 @@
 ﻿using PSI.Models;
 using PSI.Repositories.Interfaces;
+using PSI.Services.Interfaces;
 
 namespace PSI.Services
 {
-    public class AlbumService
+    public class AlbumService : IAlbumService
     {
         private readonly IAlbumRepository _albumRepository;
         private readonly ISongRepository _songRepository;

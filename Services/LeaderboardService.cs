@@ -1,10 +1,11 @@
 ﻿using PSI.DTOs;
 using PSI.Models;
 using PSI.Repositories.Interfaces;
+using PSI.Services.Interfaces;
 
 namespace PSI.Services
 {
-    public class LeaderboardService
+    public class LeaderboardService : ILeaderboardService
     {
         private readonly IPlaylistRepository _playlistRepository;
         private readonly IAlbumRepository _albumRepository;

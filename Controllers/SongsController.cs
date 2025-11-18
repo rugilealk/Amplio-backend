@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PSI.Services;
+using PSI.Services.Interfaces;
 using System.Text.Json;
 
 namespace PSI.Controllers
@@ -8,9 +8,9 @@ namespace PSI.Controllers
     [ApiController]
     public class SongsController : ControllerBase
     {
-        private readonly SongService _songService;
+        private readonly ISongService _songService;
 
-        public SongsController(SongService songService)
+        public SongsController(ISongService songService)
         {
             _songService = songService;
         }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PSI.DTOs;
-using PSI.Services;
+using PSI.Services.Interfaces;
 using PSI.Exceptions;
 using System.IO;
 
@@ -10,9 +10,9 @@ namespace PSI.Controllers
     [ApiController]
     public class PlaylistsController : ControllerBase
     {
-        private readonly PlaylistService _playlistService;
+        private readonly IPlaylistService _playlistService;
 
-        public PlaylistsController(PlaylistService playlistService)
+        public PlaylistsController(IPlaylistService playlistService)
         {
             _playlistService = playlistService;
         }
