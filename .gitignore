@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# Coverage reports
+coverage-report/
+
 # dotenv files
 .env
 
