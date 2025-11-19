@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using PSI.Data;
-using PSI.Models;
 using PSI.Repositories.Interfaces;
 
 namespace PSI.Repositories

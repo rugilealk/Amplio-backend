@@ -5,7 +5,7 @@
         public List<T> LeaderboardItems { get; set; } = new List<T>();
         public void AddSongCollection(T collection)
         {
-            if (collection != null && !LeaderboardItems.Any(c=>c.Id == collection.Id)) //gal dar padaryt, kad jei neturi elementu tai nepridesim 
+            if (collection != null && !LeaderboardItems.Any(c=>c.Id == collection.Id)) 
                 LeaderboardItems.Add(collection);
         }
 
