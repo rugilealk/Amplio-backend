@@ -125,5 +125,19 @@ namespace PSI.Controllers
             }
         }
 
+        [HttpDelete("{playlistId:guid}/current")]
+        public async Task<IActionResult> ClearCurrentSong(Guid playlistId)
+        {
+            try
+            {
+                await _playlistService.ClearCurrentSongAsync(playlistId);
+                return Ok(new { message = "Current song cleared" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
     }
 }

@@ -12,5 +12,6 @@ namespace PSI.Services.Interfaces
         Task<List<PlaylistSong>> UpvoteSongInPlaylistAsync(Guid playlistId, Guid songId);
         Task<Song> SetCurrentSongAsync(Guid playlistId);
         Task<Song?> GetCurrentSongAsync(Guid playlistId);
+        Task ClearCurrentSongAsync(Guid playlistId);
     }
 }

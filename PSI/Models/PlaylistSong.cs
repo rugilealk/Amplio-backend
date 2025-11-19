@@ -9,6 +9,7 @@ namespace PSI.Models
         public Song Song { get; set; } = null!;
 
         public int Votes { get; set; }
+        public DateTime AddedAt { get; set; }
 
         public PlaylistSong() { }
 
@@ -18,6 +19,7 @@ namespace PSI.Models
             SongId = linkedSong.Id;
             Playlist = linkedPlaylist;
             PlaylistId = linkedPlaylist.Id;
+            AddedAt = DateTime.UtcNow;
         }
 
         public void Upvote()

@@ -32,7 +32,7 @@ namespace PSI.Models
         }
 
         public List<PlaylistSong> GetAllSongs() =>
-            Songs.OrderByDescending(playlistSong => playlistSong.Votes).ToList();
+            Songs.OrderByDescending(playlistSong => playlistSong.Votes).ThenBy(playlistSong => playlistSong.AddedAt).ToList();
 
         public PlaylistSong? GetSongById(Guid songId) =>
             Songs.FirstOrDefault(playlistSong => playlistSong.SongId == songId);

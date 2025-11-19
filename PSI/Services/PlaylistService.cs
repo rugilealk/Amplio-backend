@@ -137,5 +137,13 @@ namespace PSI.Services
             return playlist ?? throw new KeyNotFoundException("Playlist not found");
         }
 
+        public async Task ClearCurrentSongAsync(Guid playlistId)
+        {
+            var playlist = await GetPlaylistByIdAsync(playlistId);
+            playlist.CurrentSong = null;
+            playlist.CurrentSongId = null;
+            await _playlistRepository.UpdateAsync(playlist);
+        }
+
     }
 }
