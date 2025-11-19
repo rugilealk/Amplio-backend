@@ -1,6 +1,4 @@
-﻿using System.Transactions;
-
-namespace PSI.Models
+﻿namespace PSI.Models
 {
     public class Album : SongCollection
     {

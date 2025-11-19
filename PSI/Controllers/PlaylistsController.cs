@@ -2,7 +2,6 @@
 using PSI.DTOs;
 using PSI.Services.Interfaces;
 using PSI.Exceptions;
-using System.IO;
 
 namespace PSI.Controllers
 {

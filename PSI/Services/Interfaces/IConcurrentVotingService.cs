@@ -1,5 +1,3 @@
-using PSI.Models;
-
 namespace PSI.Services.Interfaces
 {
     public interface IConcurrentVotingService
