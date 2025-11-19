@@ -6,5 +6,6 @@ namespace PSI.Services.Interfaces
     {
         Task UpvoteAsync(Guid playlistId, Guid songId);
         Task<int> GetVotesAsync(Guid playlistId, Guid songId);
+        Task InitializeCacheAsync();
     }
 }

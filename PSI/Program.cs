@@ -27,13 +27,13 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
-// Repositories
+
 builder.Services.AddScoped<IPlaylistRepository, PlaylistRepository>();
 builder.Services.AddScoped<ISongRepository, SongRepository>();
 builder.Services.AddScoped<IAlbumRepository, AlbumRepository>();
 builder.Services.AddScoped<IPlaylistSongRepository, PlaylistSongRepository>();
 
-// Services
+
 builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddScoped<IConcurrentVotingService, ConcurrentVotingService>();
 builder.Services.AddScoped<IPlaylistService, PlaylistService>();
@@ -43,6 +43,13 @@ builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var votingService = scope.ServiceProvider.GetRequiredService<IConcurrentVotingService>();
+    await votingService.InitializeCacheAsync();
+}
 
 app.UseCors("AllowReactApp");
 
