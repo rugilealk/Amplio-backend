@@ -1,6 +1,6 @@
 ﻿namespace PSI.Models
 {
-    public class GenericLeaderboard<T> where T : SongCollection
+    public class GenericLeaderboard<T> where T : notnull, SongCollection
     {
         public List<T> LeaderboardItems { get; set; } = new List<T>();
         public void AddSongCollection(T collection)
@@ -30,6 +30,16 @@
             {
                 LeaderboardItems.Remove(collection);
             }
+        }
+        public U GetPropertyOfMostPopular<U>(Func<T, U> selector)
+        {
+            if (LeaderboardItems.Count == 0)
+                throw new InvalidOperationException("Leaderboard is empty.");
+
+            return LeaderboardItems
+                .OrderByDescending(c => c.Popularity)
+                .Select(selector)
+                .First();
         }
     }
 }
