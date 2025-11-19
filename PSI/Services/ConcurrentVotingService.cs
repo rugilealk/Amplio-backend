@@ -1,27 +1,46 @@
-﻿using System.Collections.Concurrent;
-using PSI.Models;
+﻿using PSI.Models;
 using PSI.Services.Interfaces;
+using PSI.Repositories.Interfaces;
 
 namespace PSI.Services
 {
     public class ConcurrentVotingService : IConcurrentVotingService
     {
-        private readonly ConcurrentDictionary<Guid, int> _votes = new();
+        private readonly IPlaylistRepository _playlistRepository;
+        private readonly SemaphoreSlim _semaphore = new(1, 1);
 
-        public void Upvote(PlaylistSong song)
+        public ConcurrentVotingService(IPlaylistRepository playlistRepository)
         {
-            _votes.AddOrUpdate(
-                song.SongId,
-                1, 
-                (_, existingVotes) => existingVotes + 1 
-            );
-
-            song.Votes = _votes[song.SongId];
+            _playlistRepository = playlistRepository;
         }
 
-        public int GetVotes(Guid songId)
+        public async Task UpvoteAsync(Guid playlistId, Guid songId)
         {
-            return _votes.TryGetValue(songId, out var votes) ? votes : 0;
+            await _semaphore.WaitAsync();
+            try
+            {
+                var playlist = await _playlistRepository.GetDetailedByIdAsync(playlistId);
+                if (playlist == null)
+                    throw new KeyNotFoundException("Playlist not found");
+
+                var playlistSong = playlist.GetSongById(songId);
+                if (playlistSong == null)
+                    throw new KeyNotFoundException("Song not found in playlist");
+
+                playlistSong.Upvote();
+                await _playlistRepository.UpdateAsync(playlist);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        public async Task<int> GetVotesAsync(Guid playlistId, Guid songId)
+        {
+            var playlist = await _playlistRepository.GetDetailedByIdAsync(playlistId);
+            var playlistSong = playlist?.GetSongById(songId);
+            return playlistSong?.Votes ?? 0;
         }
     }
 }

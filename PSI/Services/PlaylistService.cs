@@ -99,9 +99,9 @@ namespace PSI.Services
             if (playlistSong == null)
                 throw new KeyNotFoundException("Song not found in playlist");
 
-            _votingService.Upvote(playlistSong);
+            await _votingService.UpvoteAsync(playlistId, songId);
 
-            await _playlistRepository.UpdateAsync(playlist);
+            playlist = await GetPlaylistByIdAsync(playlistId);
             return playlist.GetAllSongs();
         }
 
