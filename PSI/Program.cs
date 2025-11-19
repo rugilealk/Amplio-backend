@@ -44,6 +44,8 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
+app.UseMiddleware<PSI.Middleware.ExceptionLoggingMiddleware>();
+
 
 using (var scope = app.Services.CreateScope())
 {
