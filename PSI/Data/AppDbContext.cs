@@ -36,6 +36,11 @@ namespace PSI.Data
                 .HasForeignKey(playlistSong => playlistSong.SongId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<PlaylistSong>()
+                .Property(ps => ps.AddedAt)
+                .IsRequired()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
             // Configure string property lengths and requirements
             modelBuilder.Entity<Song>()
                 .Property(s => s.Link)
