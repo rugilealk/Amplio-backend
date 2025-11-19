@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PSI.Migrations
 {
     /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     public partial class SwitchToTablePerType : Migration
     {
         /// <inheritdoc />
-        [ExcludeFromCodeCoverage]
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
