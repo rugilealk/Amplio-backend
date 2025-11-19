@@ -92,7 +92,6 @@ namespace PSI.Controllers
             }
             catch (PlaylistOperationException ex)
             {
-                System.IO.File.AppendAllText("logs.txt", $"{DateTime.Now}: {ex.Message}{Environment.NewLine}");
                 return BadRequest(new { error = ex.Message });
             }
         }
