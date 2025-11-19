@@ -110,10 +110,9 @@ namespace PSI.Services
             var playlist = await GetPlaylistByIdAsync(playlistId);
             var playlistSongs = playlist.GetAllSongs();
 
-            // Custom exception used here
             if (!playlistSongs.Any())
             {
-                throw new PlaylistOperationException("Cannot set current song because the playlist is empty.");
+                throw new PlaylistOperationException("Cannot set current song because the playlist is empty.", playlist.Id);
             }
 
             var topSong = playlistSongs.First().Song;
