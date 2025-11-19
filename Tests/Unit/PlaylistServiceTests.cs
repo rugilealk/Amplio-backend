@@ -85,7 +85,7 @@ public class PlaylistServiceTests
 
         var result = await _playlistService.UpvoteSongInPlaylistAsync(playlistId, songId);
         result.Should().HaveCount(1);
-        _votingService.Verify(v => v.Upvote(It.IsAny<PlaylistSong>()), Times.Once);
+        _votingService.Verify(v => v.UpvoteAsync(playlistId, songId), Times.Once);
     }
 
     [Fact]
