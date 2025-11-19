@@ -55,7 +55,7 @@ public class AlbumControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task CreateAlbum_InvalidRequest_ReturnsBadRequest()
     {
-        var bad = new AlbumDto { Name = "", Artist = "Artist", ReleaseYear = 1999 }; // empty name
+        var bad = new AlbumDto { Name = "", Artist = "Artist", ReleaseYear = 1999 };
         var response = await _client.PostAsJsonAsync("/albums", bad);
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -70,7 +70,6 @@ public class AlbumControllerTests : IClassFixture<CustomWebApplicationFactory>
     [Fact]
     public async Task AddSongToAlbum_Valid_ReturnsOk_AndSongLinked()
     {
-        // Seed album + song directly via DbContext
         Guid albumId;
         Guid songId;
         using (var scope = _factory.Services.CreateScope())
