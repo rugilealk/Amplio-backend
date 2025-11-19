@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
-using PSI.Data;
 
 namespace PSI.Data
 {
@@ -9,7 +7,6 @@ namespace PSI.Data
     {
         public AppDbContext CreateDbContext(string[] args)
         {
-            // Load configuration from project directory
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
