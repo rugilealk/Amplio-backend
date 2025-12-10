@@ -13,5 +13,6 @@ namespace PSI.Services.Interfaces
         Task<Song> SetCurrentSongAsync(Guid playlistId);
         Task<Song?> GetCurrentSongAsync(Guid playlistId);
         Task ClearCurrentSongAsync(Guid playlistId);
+        Task<Playlist> GetPlaylistByIdAsync(Guid playlistId);
     }
 }
