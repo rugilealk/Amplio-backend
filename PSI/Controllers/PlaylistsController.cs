@@ -2,11 +2,15 @@
 using PSI.DTOs;
 using PSI.Services.Interfaces;
 using PSI.Exceptions;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace PSI.Controllers
 {
-    [Route("playlist")]
+    [Authorize]
     [ApiController]
+    [Route("api/[controller]")]
+
     public class PlaylistsController : ControllerBase
     {
         private readonly IPlaylistService _playlistService;

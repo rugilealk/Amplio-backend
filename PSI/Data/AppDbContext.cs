@@ -10,6 +10,8 @@ namespace PSI.Data
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
         public DbSet<Album> Albums { get; set; }
+        public DbSet<User> Users { get; set; }
+
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
