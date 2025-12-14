@@ -39,6 +39,19 @@ namespace PSI.Controllers
                 return NotFound(ex.Message);
             }
         }
+        [HttpGet("{playlistId:guid}/name")]
+        public async Task<IActionResult> GetPlaylistName(Guid playlistId)
+        {
+            try
+            {
+                var playlist = await _playlistService.GetPlaylistByIdAsync(playlistId);
+                return Ok(playlist.Name);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
 
         [HttpPost("{playlistId:guid}/add/{songId:guid}")]
         public async Task<IActionResult> AddSongToPlaylist(Guid playlistId, Guid songId)
