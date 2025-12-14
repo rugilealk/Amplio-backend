@@ -32,25 +32,20 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = false,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "KJH87324hjkhjdsahJKH9832y@$%76543hkjasdHJASD")
-        )
-    };
-});
-
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
 builder.Services.AddAuthorization();
 
 
@@ -65,6 +60,7 @@ builder.Services.AddScoped<IConcurrentVotingService, ConcurrentVotingService>();
 builder.Services.AddScoped<IPlaylistService, PlaylistService>();
 builder.Services.AddScoped<IAlbumService, AlbumService>();
 builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddHttpClient();
 
@@ -83,9 +79,10 @@ app.UseCors("AllowReactApp");
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseAuthentication();
+
 
 app.MapControllers();
 

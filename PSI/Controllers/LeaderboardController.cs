@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PSI.Services.Interfaces;
 
 namespace PSI.Controllers
 {
-    [Route("leaderboard")] 
+    [Route("leaderboard")]
     [ApiController]
     public class LeaderboardController : ControllerBase
     {
