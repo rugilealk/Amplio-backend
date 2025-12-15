@@ -130,7 +130,7 @@ namespace PSI.Controllers
             try
             {
                 var currentSong = await _playlistService.GetCurrentSongAsync(playlistId);
-                return Ok(currentSong);
+                return currentSong != null ? Ok(currentSong) : NoContent();
             }
             catch (KeyNotFoundException ex)
             {

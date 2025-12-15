@@ -70,6 +70,13 @@ namespace PSI.Data
                     genres => JsonSerializer.Serialize(genres, (JsonSerializerOptions)null),
                     genresJson => JsonSerializer.Deserialize<List<Genre>>(genresJson, (JsonSerializerOptions)null) ?? new List<Genre>()
                 );
+
+            // Exclude Popularity from being persisted (it's calculated in-memory)
+            modelBuilder.Entity<Album>()
+                .Ignore(a => a.Popularity);
+
+            modelBuilder.Entity<Playlist>()
+                .Ignore(p => p.Popularity);
         }
     }
 }

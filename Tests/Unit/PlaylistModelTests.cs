@@ -8,7 +8,7 @@ public class PlaylistModelTests
     [Fact]
     public void AddSong_NoDuplicates()
     {
-        var playlist = new Playlist("P", true);
+        var playlist = new Playlist("P", true, Guid.NewGuid());
         var song = new Song { Id = Guid.NewGuid(), Title = "T" };
         playlist.AddSong(song);
         playlist.AddSong(song);
@@ -18,7 +18,7 @@ public class PlaylistModelTests
     [Fact]
     public void IncreasePopularity_IncrementsVisitCount()
     {
-        var playlist = new Playlist("P", true);
+        var playlist = new Playlist("P", true, Guid.NewGuid());
         playlist.VisitCount.Should().Be(0);
         playlist.IncreasePopularity();
         playlist.VisitCount.Should().Be(1);

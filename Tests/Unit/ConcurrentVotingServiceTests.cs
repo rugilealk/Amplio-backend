@@ -21,7 +21,7 @@ public class ConcurrentVotingServiceTests
     public async Task Upvote_IncrementsVotes()
     {
         var song = new Song { Id = Guid.NewGuid(), Title = "T" };
-        var playlist = new Playlist("P", true);
+        var playlist = new Playlist("P", true, Guid.NewGuid());
         playlist.AddSong(song);
         _playlistRepository.Setup(r => r.GetDetailedByIdAsync(playlist.Id)).ReturnsAsync(playlist);
 
@@ -38,7 +38,7 @@ public class ConcurrentVotingServiceTests
     public async Task Upvote_IsThreadSafe()
     {
         var song = new Song { Id = Guid.NewGuid(), Title = "T" };
-        var playlist = new Playlist("P", true);
+        var playlist = new Playlist("P", true, Guid.NewGuid());
         playlist.AddSong(song);
 
         _playlistRepository.Setup(r => r.GetDetailedByIdAsync(playlist.Id))
@@ -56,7 +56,7 @@ public class ConcurrentVotingServiceTests
     public async Task GetVotes_ReturnsCorrectValue()
     {
         var song = new Song { Id = Guid.NewGuid(), Title = "T" };
-        var playlist = new Playlist("P", true);
+        var playlist = new Playlist("P", true, Guid.NewGuid());
         playlist.AddSong(song);
 
         playlist.Songs.First().Votes = 7;
