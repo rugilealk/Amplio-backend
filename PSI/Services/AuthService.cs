@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PSI.Data;
+using PSI.Exceptions;
 using PSI.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -22,10 +23,22 @@ namespace PSI.Services
 
 		public async Task<string> Register(string username, string password)
 		{
-			if (await _context.Users.AnyAsync(u => u.Username == username))
-				throw new Exception("Username exists");
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Username cannot be empty");
 
-			CreatePasswordHash(password, out byte[] hash, out byte[] salt);
+            if (username.Length < 3 || username.Length > 20)
+                throw new ArgumentException("Username must be between 3 and 20 characters");
+
+			if (string.IsNullOrWhiteSpace(password))
+				throw new ArgumentException("Password cannot be empty");
+            
+			if (password.Length < 6)
+                throw new InvalidPasswordException("Password must be at least 6 characters long");
+
+            if (await _context.Users.AnyAsync(u => u.Username == username))
+                throw new UsernameAlreadyExistsException();
+
+            CreatePasswordHash(password, out byte[] hash, out byte[] salt);
 
 			var user = new User
 			{
@@ -42,13 +55,15 @@ namespace PSI.Services
 
 		public async Task<string> Login(string username, string password)
 		{
-			var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-			if (user == null) throw new Exception("User not found");
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
+                throw new InvalidCredentialsException();
 
-			if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
-				throw new Exception("Wrong password");
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
 
-			return CreateToken(user);
+            if (user == null || !VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                throw new InvalidCredentialsException();
+
+            return CreateToken(user);
 		}
 
 		private string CreateToken(User user)
@@ -59,9 +74,7 @@ namespace PSI.Services
 				new Claim(ClaimTypes.Name, user.Username)
 			};
 
-			var key = new SymmetricSecurityKey(
-				Encoding.UTF8.GetBytes(_config["Jwt:Key"])
-			);
+			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 			var token = new JwtSecurityToken(

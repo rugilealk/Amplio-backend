@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PSI.DTOs;
-using PSI.Services.Interfaces;
 using PSI.Exceptions;
-using Microsoft.AspNetCore.Authorization;
+using PSI.Services.Interfaces;
+using System.Security.Claims;
 
 
 namespace PSI.Controllers
 {
+    [Route("playlist")]
     [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
 
     public class PlaylistsController : ControllerBase
     {
@@ -23,11 +24,21 @@ namespace PSI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreatePlaylist([FromBody] CreatePlaylistRequestDto request)
         {
-            if (string.IsNullOrWhiteSpace(request.Name))
-                return BadRequest("Playlist name cannot be empty.");
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-            var playlist = await _playlistService.CreatePlaylistAsync(request.Name, request.IsPublic, request.CurrentSongId);
-            return Created($"/playlist/{playlist.Id}", new { playlist.Id, playlist.Name, playlist.IsPublic, playlist.CurrentSongId });
+            var playlist = await _playlistService.CreatePlaylistAsync(
+                request.Name,
+                request.IsPublic,
+                request.CurrentSongId,
+                userId
+            );
+
+            return Created($"/playlist/{playlist.Id}", new
+            {
+                playlist.Id,
+                playlist.Name,
+                playlist.IsPublic
+            });
         }
 
         [HttpGet("{playlistId:guid}")]
@@ -151,6 +162,28 @@ namespace PSI.Controllers
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("personal")]
+        public async Task<IActionResult> GetMyPlaylists()
+        {
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+            try
+            {
+                var playlists = await _playlistService.GetPlaylistsByOwnerAsync(userId);
+
+                return Ok(playlists.Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.IsPublic
+                }));
+            }
+            catch (KeyNotFoundException)
+            {
+                return Ok(new List<object>()); 
             }
         }
 

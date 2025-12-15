@@ -3,6 +3,7 @@ namespace PSI.Models
 {
     public class Playlist : SongCollection, IEnumerable<PlaylistSong>
     {
+        public Guid OwnerId { get; set; }
         public Guid? CurrentSongId { get; set; }
         public Song? CurrentSong { get; set; } = null!;
         public List<PlaylistSong> Songs { get; set; } = new List<PlaylistSong>();
@@ -10,10 +11,11 @@ namespace PSI.Models
         public bool IsPublic { get; set; } = false;
         public int VisitCount { get; set; } = 0;
         public Playlist() { }
-        public Playlist(string name, bool isPublic)
+        public Playlist(string name, bool isPublic, Guid ownerId)
         {
             Name = name;
             IsPublic = isPublic;
+            OwnerId = ownerId;
         }
 
         public override void IncreasePopularity()

@@ -24,14 +24,14 @@ namespace PSI.Services
             _votingService = votingService;
         }
 
-        public async Task<Playlist> CreatePlaylistAsync(string name, bool isPublic, Guid? currentSongId = null)
+        public async Task<Playlist> CreatePlaylistAsync(string name, bool isPublic, Guid? currentSongId, Guid ownerId)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 throw new ArgumentException("Playlist name cannot be empty", nameof(name));
             }
 
-            var playlist = new Playlist(name, isPublic)
+            var playlist = new Playlist(name, isPublic, ownerId)
             {
                 CurrentSongId = currentSongId
             };
@@ -143,6 +143,20 @@ namespace PSI.Services
             playlist.CurrentSongId = null;
             await _playlistRepository.UpdateAsync(playlist);
         }
+        public async Task<List<Playlist>> GetPlaylistsByOwnerAsync(Guid ownerId)
+        {
+            var allPlaylists = await _playlistRepository.GetAllAsync();
 
+            var userPlaylists = allPlaylists
+                .Where(p => p.OwnerId == ownerId)
+                .ToList();
+
+            if (!userPlaylists.Any())
+            {
+                throw new KeyNotFoundException("No playlists found for this user.");
+            }
+
+            return userPlaylists;
+        }
     }
 }
