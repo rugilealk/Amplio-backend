@@ -66,6 +66,21 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
+
+app.UseMiddleware<PSI.Middleware.ExceptionLoggingMiddleware>();
+
+using (var scope = app.Services.CreateScope())
+{
+    var votingService = scope.ServiceProvider.GetRequiredService<IConcurrentVotingService>();
+    await votingService.InitializeCacheAsync();
+}
+
+
 app.UseMiddleware<PSI.Middleware.ExceptionLoggingMiddleware>();
 
 
