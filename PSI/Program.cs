@@ -69,7 +69,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
+    if (dbContext.Database.ProviderName != "Microsoft.EntityFrameworkCore.InMemory")
+    {
+        dbContext.Database.Migrate();
+    }
 }
 
 app.UseMiddleware<PSI.Middleware.ExceptionLoggingMiddleware>();
