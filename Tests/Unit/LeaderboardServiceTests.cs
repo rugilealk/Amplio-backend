@@ -28,8 +28,8 @@ public class LeaderboardServiceTests
     [Fact]
     public async Task GetPlaylistLeaderboardAsync_ReturnsSorted()
     {
-        var p1 = new Playlist("P1", true) { Popularity = 1 };
-        var p2 = new Playlist("P2", true) { Popularity = 5 };
+        var p1 = new Playlist("P1", true, Guid.NewGuid()) { Popularity = 1 };
+        var p2 = new Playlist("P2", true, Guid.NewGuid()) { Popularity = 5 };
         _playlistRepository.Setup(r => r.GetPublicPlaylistsAsync()).ReturnsAsync(new List<Playlist> { p1, p2 });
         
         var result = await _leaderboardService.GetPlaylistLeaderboardAsync();

@@ -34,7 +34,7 @@ public class PlaylistServiceTests
     [Fact]
     public async Task CreatePlaylistAsync_Valid_Creates()
     {
-        var playlist = await _playlistService.CreatePlaylistAsync("My", true);
+        var playlist = await _playlistService.CreatePlaylistAsync("My", true, Guid.NewGuid(), Guid.NewGuid());
         playlist.Name.Should().Be("My");
         _playlistRepository.Verify(r => r.AddAsync(It.IsAny<Playlist>()), Times.Once);
     }
@@ -42,7 +42,7 @@ public class PlaylistServiceTests
     [Fact]
     public async Task CreatePlaylistAsync_InvalidName_Throws()
     {
-        await Assert.ThrowsAsync<ArgumentException>(() => _playlistService.CreatePlaylistAsync("", true));
+        await Assert.ThrowsAsync<ArgumentException>(() => _playlistService.CreatePlaylistAsync("", true, Guid.NewGuid(), Guid.NewGuid()));
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class PlaylistServiceTests
     {
         var playlistId = Guid.NewGuid();
         var songId = Guid.NewGuid();
-        var playlist = new Playlist("P", true) { Id = playlistId };
+        var playlist = new Playlist("P", true, Guid.NewGuid()) { Id = playlistId };
         var song = new Song { Id = songId };
         _playlistRepository.Setup(r => r.GetDetailedByIdAsync(playlistId)).ReturnsAsync(playlist);
         _songRepository.Setup(r => r.GetByIdAsync(songId)).ReturnsAsync(song);
@@ -65,7 +65,7 @@ public class PlaylistServiceTests
     {
         var playlistId = Guid.NewGuid();
         var songId = Guid.NewGuid();
-        var playlist = new Playlist("P", true) { Id = playlistId };
+        var playlist = new Playlist("P", true, Guid.NewGuid()) { Id = playlistId };
         playlist.AddSong(new Song { Id = songId });
         _playlistRepository.Setup(r => r.GetDetailedByIdAsync(playlistId)).ReturnsAsync(playlist);
 
@@ -78,7 +78,7 @@ public class PlaylistServiceTests
     {
         var playlistId = Guid.NewGuid();
         var songId = Guid.NewGuid();
-        var playlist = new Playlist("P", true) { Id = playlistId };
+        var playlist = new Playlist("P", true, Guid.NewGuid()) { Id = playlistId };
         var song = new Song { Id = songId };
         playlist.AddSong(song);
         _playlistRepository.Setup(r => r.GetDetailedByIdAsync(playlistId)).ReturnsAsync(playlist);
@@ -93,7 +93,7 @@ public class PlaylistServiceTests
     {
         var playlistId = Guid.NewGuid();
         var songId = Guid.NewGuid();
-        var playlist = new Playlist("P", true) { Id = playlistId };
+        var playlist = new Playlist("P", true, Guid.NewGuid()) { Id = playlistId };
         playlist.AddSong(new Song { Id = songId });
         _playlistRepository.Setup(r => r.GetDetailedByIdAsync(playlistId)).ReturnsAsync(playlist);
         
